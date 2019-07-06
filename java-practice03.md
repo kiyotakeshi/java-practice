@@ -90,3 +90,34 @@ public class Main {
 }
 
 ```
+
+- 複数の引数を渡す
+    - メソッド側で宣言する変数の型と引数として渡される値の順番を合わせる必要がある
+    - 渡す値、受け取る変数も共に引数と呼ばれる
+        - 呼び分ける場合、渡す値のことを実引数、受け取る変数のことを仮引数とよぶ
+
+```
+package com.kiyota;
+
+public class Main {
+    public static void main(String[] args) {
+
+        // 100,200は渡す値、実引数
+        add(100, 200);
+        add(200, 300);
+    }
+
+    // x,yは受け取る変数,仮引数
+    // x,yはメソッド内で宣言したローカル変数
+    public static void add(int x, int y) {
+        int ans = x + y;
+        System.out.println(x + " + " + y + " = " + ans);
+    }
+    // 出力結果
+    // 100 + 200 = 300
+    // 200 + 300 = 500
+}
+
+```
+
+-
