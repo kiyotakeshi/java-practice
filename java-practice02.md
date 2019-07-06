@@ -427,3 +427,110 @@ public class Main {
 }
 
 ```
+
+- 多次元配列
+
+```
+package com.kiyota;
+
+public class Main {
+    public static void main(String[] args) {
+        // 2人の3教科のテスト結果を格納する2次元配列
+        // 最初の[]で行、次の[]で列を指定
+        // 配列の配列という構造になっている
+
+        // int[][] scores = new int[2][3];
+        // scores[0][0] = 40;
+        // scores[0][1] = 50;
+        // scores[0][2] = 60;
+        // scores[1][0] = 80;
+        // scores[1][1] = 60;
+        // scores[1][2] = 70;
+        // System.out.println(scores[1][1]); // 60
+
+        int[][] scores = {{10, 20, 30}, {30, 40, 50}};
+        // 親配列の要素数
+        System.out.println(scores.length); // 2
+        // 子配列の要素数
+        System.out.println(scores[0].length); // 3
+    }
+}
+
+```
+
+- 配列の初期化(復習)
+
+```
+package com.kiyota;
+
+public class Main {
+    public static void main(String[] args) {
+        // int型の値を4つ格納できる配列
+        int[] points = new int[4];
+        // doubel型の値を5つ格納できる配列
+        double[] weights = new double[5];
+        // String型の値を3つ格納できる配列
+        String[] names = new String[3];
+    }
+}
+
+```
+
+- 配列の取り出し(復習)
+
+```
+package com.kiyota;
+
+public class Main {
+    public static void main(String[] args) {
+        // int[] moneyList = new int[3];
+        // moneyList[0]=1000;
+        // moneyList[1]=5000;
+        // moneyList[2]=15000;
+        int[] moneyList = {1000, 5000, 15000};
+
+        // javaは変数の宣言が必要！
+        // for (i=0;i<moneyList.length;i++){
+        for (int i = 0; i < moneyList.length; i++) {
+            System.out.println(moneyList[i]);
+            // 1000
+            // 5000
+            // 15000
+        }
+
+        // 拡張for
+        for (int m : moneyList) {
+            System.out.println(m);
+        }
+
+    }
+}
+
+```
+
+- 配列、ifの組み合わせ
+
+```
+package com.kiyota;
+
+public class Main {
+    public static void main(String[] args) {
+        // int[] numbers = new int[3];
+        // numbers[0] = 3;
+        // numbers[1] = 4;
+        // numbers[2] = 9;
+        int[] numbers = {3, 4, 9};
+        System.out.println("Type digit number,please");
+        int input = new java.util.Scanner(System.in).nextInt();
+
+        // for (n:numbers){
+        for (int n : numbers) {
+            if (n == input) {
+                System.out.println("Match!");
+            }
+        }
+    }
+
+}
+
+```
