@@ -101,6 +101,7 @@ Miles = 7
 
     - 1つのプログラムを複数の部品に分けることを「部品化」という
 
+---
 
 - 計算機プログラムを分割
 
@@ -175,6 +176,8 @@ public class Calc {
 
 ```
 
+---
+
 - 複数クラスのコンパイル
     - 完成品としてはこの2つのクラスファイルが必要
     - IDEで作るときは雛形を使用するとMain.javaが生成されてうまくいかないことも
@@ -248,7 +251,7 @@ public class CalcLogic {
 
 - FQCNの入力の負担はimport文で軽減できる
     - あくまでも入力の負担を軽減するもの
-    
+
 ```
 package calcapp.main;
 import calcapp.logics.CalcLogic;
@@ -269,3 +272,60 @@ public class Calc {
 }
 
 ```
+
+---
+
+- 作成したクラスは様々なプログラムと連携して動く
+    - 標準搭載されているクラス(API)は200パッケージ、3500以上のクラスがある
+
+```
+# JVMに組み込まれたクラスの完全限定クラス名を出力
+# 300件以上のプログラムと連携して動いていることがわかる
+
+kiyota-MacBook-Pro:Calc kiyotatakeshi$ java -verbose:class HelloWorld
+
+```
+
+- APIが組み込まれているおかげで命令部分を作る必要がない
+    - arrays.classなどの形でJDKをインストールした際にコピーされている
+
+```
+package com.kiyota;
+
+public class Main {
+
+    public static void main(String[] args) {
+        int[] heights = {172, 180, 163, 157};
+
+        // APIを使用することで自動で並び替える
+        // APIは専門家がつくったもので高速かつバグが少ない
+        java.util.Arrays.sort(heights);
+
+        for(int h:heights){
+            System.out.println(h);
+        }
+    }
+}
+
+```
+
+- APIに含まれるパッケージ
+
+    - java.lang
+        - 重要クラス群
+
+    - java.util
+        - プログラミングを便利にするクラス群
+
+    - java.math
+        - 数学に関するパッケージ
+
+    - java.net
+        - ネットワークに関するもの
+
+    - java.io
+        - データを逐次処理するためのもの
+
+- System.out.println() は java.lang.System
+
+---
