@@ -62,6 +62,8 @@ public class Main {
 
 ```
 
+---
+
 - 引数
     - メソッドを呼び出す際に、呼び出し元から値を渡される値のこと
     - 受け取った値を使って処理に使用することができる
@@ -148,6 +150,8 @@ public class Main {
 
 ```
 
+---
+
 - 戻り値
     - 呼び出されたメソッドから呼び出し元のメソッドへ値を返すことを値を戻す(返す)という
     - 戻される値のことを戻り値(返り値)と呼ぶ
@@ -219,6 +223,8 @@ public class Main {
 }
 
 ```
+
+---
 
 - オーバーロード
     - 例外的に同じ名前のメソッドを定義すること(多重定義)
@@ -293,5 +299,78 @@ public class Main {
 - メソッド宣言で戻り値の型の後に記載する情報はまとめて、「メソッドのシグネチャ」と呼ぶ
     - メソッド名、引数の個数、型、並び順
     - シグネチャが重複しない場合、オーバーロードが可能
+
+---
+
+- 引数に配列を使う
+
+```
+package com.kiyota;
+
+public class Main {
+    public static void main(String[] args) {
+        int[] array = {1, 2, 3};
+
+        // メソッドの実引数として配列を渡す
+        // 渡しているのは配列まるごとではなく、アドレスの情報のみ(参照渡し)
+        printArray(array);
+    }
+
+    // メソッドの仮引数(受け取る変数)で配列を指定
+    // int[]のような配列型変数には配列の実体を指し示すメモリ番号が入っている
+    public static void printArray(int[] array) {
+        for (int element : array) {
+            // 配列の要素を出力
+            System.out.println(element);
+        }
+
+    }
+
+}
+
+```
+
+- 参照渡し(厳密には「参照の値渡し」と呼ばれる)の確認
+
+```
+package com.kiyota;
+
+public class Main {
+    public static void main(String[] args) {
+        int[] array = {1, 2, 3};
+
+        for (int i : array) {
+            System.out.println(i);
+            // 1
+            // 2
+            // 3
+        }
+
+        // メソッドが呼ばて値が1増える
+        // 呼び出し先のメソッドでの変更が呼び出し元に影響を与える
+        incArray(array);
+
+        // arrayの全要素を出力
+        for (int i : array) {
+            System.out.println(i);
+            // 2
+            // 3
+            // 4
+        }
+    }
+
+    // 配列の要素に1を加えるメソッド
+    public static void incArray(int[] array) {
+        for (int i = 0; i < array.length; i++) {
+            array[i]++;
+        }
+    }
+
+
+}
+
+```
+
+---
 
 - 
