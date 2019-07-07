@@ -230,7 +230,7 @@ public class Calc {
 
 # CalcLogic.java
 
-package calcapp.logic;
+package calcapp.logics;
 
 public class CalcLogic {
     public static int tasu(int a, int b) {
@@ -241,6 +241,16 @@ public class CalcLogic {
         return (a - b);
     }
 }
+
+kiyota-MacBook-Pro:src kiyotatakeshi$ javac Calc.java CalcLogic.java
+
+kiyota-MacBook-Pro:src kiyotatakeshi$ ls
+Calc.class      Calc.java       CalcLogic.class CalcLogic.java
+
+kiyota-MacBook-Pro:src kiyotatakeshi$ java Calc
+エラー: メイン・クラスCalcを検出およびロードできませんでした
+原因: java.lang.NoClassDefFoundError: calcapp/main/Calc (wrong name: Calc)
+
 
 ```
 
@@ -263,7 +273,7 @@ public class Calc {
         int b = 2;
 
         // FQCNで指定してもしなくてもよくなる
-        int total = tasu(a, b);
+        int total = CalcLogic.tasu(a, b);
         int delta = calcapp.logics.CalcLogic.hiku(a, b);
 
         System.out.println("add result:" + total);
@@ -334,7 +344,8 @@ public class Main {
 
     - JVMが必要なクラスファイルを読み込む処理を「クラスローディング」という
     - 必要になった時に必要なクラスだけメモリに読み込む
-    - JVMの中のクラスローダーがクラスファイルの読み書きをする(ハードディスク内の特定のクラスファイルを読む)
+    - JVMの中のクラスローダーがクラスファイルの読み書きをする
+        - ハードディスク内の特定のクラスファイルを読む
         - クラスファイルがどのフォルダにあるかはクラスパスを基に探し出される
 
 - クラスパスを指定する方法
@@ -355,3 +366,73 @@ public class Main {
     - Javaをインストールしたフォルダの配下(lib)に含まれている
     - 展開するとjavaフォルダ、langフォルダ、System.classなどがある
     - 意識することなく、SystemクラスなどのAPIが利用できる
+
+---
+
+- パッケージとクラス
+
+- コンパイルはできるがエラーで実行できない
+    - `NoClassDefFoundError`、つまりクラス定義が見つからない状態
+
+```
+kiyota-MacBook-Pro:src kiyotatakeshi$ javac Calc.java CalcLogic.java
+
+kiyota-MacBook-Pro:src kiyotatakeshi$ ls
+Calc.class      Calc.java       CalcLogic.class CalcLogic.java
+
+kiyota-MacBook-Pro:src kiyotatakeshi$ java Calc
+エラー: メイン・クラスCalcを検出およびロードできませんでした
+原因: java.lang.NoClassDefFoundError: calcapp/main/Calc (wrong name: Calc)
+
+```
+
+- 起動しようとしているクラスの指定が間違っている
+    - `java 起動したいクラスのFQCN`でコマンドを実行
+    - java Calc だとデフォルトパッケージにあるCalcクラスを実行しようとする
+
+```
+# まだエラー
+kiyota-MacBook-Pro:src kiyotatakeshi$ java calcapp.main.Calc
+エラー: メイン・クラスcalcapp.main.Calcを検出およびロードできませんでした
+原因: java.lang.ClassNotFoundException: calcapp.main.Calc
+
+```
+
+- クラスローダーが目的のクラスファイルを探し出せていない
+    - クラスパスで指定されたフォルダを対象に探す
+    - 現在のクラスパスを基準に、パッケージ階層に対応したフォルダをつくり、クラスファイルを配置する
+
+- クラスパス(work)を基準として配置
+
+```
+kiyota-MacBook-Pro:src kiyotatakeshi$ pwd
+/Users/kiyotatakeshi/Desktop/Java/Calc/src
+
+# ディレクトリの作成
+kiyota-MacBook-Pro:src kiyotatakeshi$ mkdir -p ./work/calcapp/main
+kiyota-MacBook-Pro:src kiyotatakeshi$ mkdir ./work/calcapp/logics
+
+# クラスファイルの移動
+kiyota-MacBook-Pro:src kiyotatakeshi$ mv Calc.class work/calcapp/main/
+kiyota-MacBook-Pro:src kiyotatakeshi$ mv CalcLogic.class work/calcapp/logics/
+
+kiyota-MacBook-Pro:src kiyotatakeshi$ tree -L 4 work/
+work/
+└── calcapp
+    ├── logics
+    │   └── CalcLogic.class
+    └── main
+        └── Calc.class
+
+3 directories, 2 files
+
+```
+
+- 実行
+
+```
+kiyota-MacBook-Pro:work kiyotatakeshi$ java calcapp.main.Calc
+add result:12
+delta result:8
+
+```
