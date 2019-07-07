@@ -373,4 +373,44 @@ public class Main {
 
 ---
 
-- 
+- 戻り値に配列を使う
+
+```
+package com.kiyota;
+
+public class Main {
+    public static void main(String[] args) {
+
+        // makeArrayメソッドを実引数(渡す値)3で呼び出して配列arrayに入れる
+        int[] array = makeArray(3);
+
+        // 配列の中身を出力
+        for (int i : array) {
+            System.out.println(i);
+            // 0
+            // 1
+            // 2
+        }
+    }
+
+
+    // int型配列を作成して戻すメソッド
+    // 配列を戻すからstaticの後は int[]
+    public static int[] makeArray(int size) {
+        int[] newArray = new int[size];
+        for (int i = 0; i < newArray.length; i++) {
+            newArray[i] = i;
+        }
+
+        // 配列を戻す
+        return newArray;
+    }
+
+
+}
+
+```
+
+---
+
+-
