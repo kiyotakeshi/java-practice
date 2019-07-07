@@ -89,3 +89,183 @@ Miles = 7
 10.5 km/h = 7mi/h
 
 ```
+
+---
+
+- ソースファイルの分割(Classの分割)
+
+    - mainメソッドを複数のメソッドに分割するだけでは1つのソースファイルが肥大化して見通しが悪くなる
+
+    - ソールファイルを分けて開発することは、複数のクラスに分けて開発すること
+        - ソースファイルには1つ以上のクラスが必要なため
+
+    - 1つのプログラムを複数の部品に分けることを「部品化」という
+
+
+- 計算機プログラムを分割
+
+```
+# 1つのプログラム
+
+package com.kiyota;
+
+public class Main {
+
+    public static void main(String[] args) {
+        int a = 10;
+        int b = 2;
+        int total = tasu(a, b);
+        int delta = hiku(a, b);
+        System.out.println("add result:" + total);
+        System.out.println("delta result:" + delta);
+    }
+
+    public static int tasu(int a, int b) {
+        return (a + b);
+    }
+
+    public static int hiku(int a, int b) {
+        return (a - b);
+    }
+}
+
+```
+
+- 計算処理をするメソッドと画面に表示するメソッドに分割する
+
+1. 計算処理メソッドを記述するためのソースファイルを作る(CalcLogic.java)
+2. tasu() と hiku() を移動する
+
+```
+# CalcLogic.java
+
+package com.kiyota;
+
+public class CalcLogic {
+    public static int tasu(int a, int b) {
+        return (a + b);
+    }
+
+    public static int hiku(int a, int b) {
+        return (a - b);
+    }
+}
+
+
+# Calc.java
+package com.kiyota;
+
+public class Calc {
+
+    public static void main(String[] args) {
+        int a = 10;
+        int b = 2;
+
+        // このソースファイルには存在しないメソッドのためコンパイルエラーになる
+        // 同じクラスに属していないため CalcLogic のメソッドと指定する必要がある
+        // int total = tasu(a, b);
+        // int delta = hiku(a, b);
+
+        int total = CalcLogic.tasu(a, b);
+        int delta = CalcLogic.hiku(a, b);
+        System.out.println("add result:" + total);
+        System.out.println("delta result:" + delta);
+    }
+}
+
+```
+
+- 複数クラスのコンパイル
+    - 完成品としてはこの2つのクラスファイルが必要
+    - IDEで作るときは雛形を使用するとMain.javaが生成されてうまくいかないことも
+
+```
+kiyota-MacBook-Pro:src kiyotatakeshi$ ls
+Calc.java       CalcLogic.java
+
+kiyota-MacBook-Pro:src kiyotatakeshi$ javac Calc.java CalcLogic.java
+
+kiyota-MacBook-Pro:src kiyotatakeshi$ ls
+Calc.class      Calc.java       CalcLogic.class CalcLogic.java
+
+kiyota-MacBook-Pro:src kiyotatakeshi$ java Calc
+add result:12
+delta result:8
+
+```
+
+- Javaプログラムの完成品は複数のクラスファイルの集合体(すべてのクラスファイルが必要)
+    - JAR(Java ARchive)形式で一つにまとめる(jarコマンドが使える)
+
+- 渡された複数のクラスファイルのうちmainメソッドが含まれているクラスの名前を指定する必要がある
+    - 今回だと `java Calc` で実行
+
+- クラスが増えすぎるとパッケージというグループで分類、管理する
+    - パッケージに親子関係や階層関係はない
+
+- 以下のように書く(今の段階ではコンパイルまでしかできない)
+
+```
+# Calc.java
+
+package calcapp.main;
+
+public class Calc {
+
+    public static void main(String[] args) {
+        int a = 10;
+        int b = 2;
+
+        // 所属パッケージ名を添えたクラス名を指定
+        // あるクラスから別のパッケージのクラス名を使用する場合、完全限定クラス名(FQCN)が必要
+        int total = calcapp.logics.CalcLogic.tasu(a, b);
+        int delta = calcapp.logics.CalcLogic.hiku(a, b);
+        System.out.println("add result:" + total);
+        System.out.println("delta result:" + delta);
+    }
+}
+
+# CalcLogic.java
+
+package calcapp.logic;
+
+public class CalcLogic {
+    public static int tasu(int a, int b) {
+        return (a + b);
+    }
+
+    public static int hiku(int a, int b) {
+        return (a - b);
+    }
+}
+
+```
+
+- パッケージを使うことで自分が作るクラスに対して開発者が自由な名前がつけられる
+    - 大規模なプロジェクトで偶然同じクラス名を使用してしまっても大丈夫
+    - 名前の衝突を避け、限られた名前空間を区別して使えるようにできる
+    - パッケージ名の衝突についてはインターネットドメインをパッケージ名に使うことで衝突を回避できる
+
+- FQCNの入力の負担はimport文で軽減できる
+    - あくまでも入力の負担を軽減するもの
+    
+```
+package calcapp.main;
+import calcapp.logics.CalcLogic;
+
+public class Calc {
+
+    public static void main(String[] args) {
+        int a = 10;
+        int b = 2;
+
+        // FQCNで指定してもしなくてもよくなる
+        int total = tasu(a, b);
+        int delta = calcapp.logics.CalcLogic.hiku(a, b);
+
+        System.out.println("add result:" + total);
+        System.out.println("delta result:" + delta);
+    }
+}
+
+```
