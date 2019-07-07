@@ -108,7 +108,6 @@ Miles = 7
 ```
 # 1つのプログラム
 
-package com.kiyota;
 
 public class Main {
 
@@ -140,7 +139,6 @@ public class Main {
 ```
 # CalcLogic.java
 
-package com.kiyota;
 
 public class CalcLogic {
     public static int tasu(int a, int b) {
@@ -154,7 +152,6 @@ public class CalcLogic {
 
 
 # Calc.java
-package com.kiyota;
 
 public class Calc {
 
@@ -300,7 +297,6 @@ kiyota-MacBook-Pro:Calc kiyotatakeshi$ java -verbose:class HelloWorld
     - arrays.classなどの形でJDKをインストールした際にコピーされている
 
 ```
-package com.kiyota;
 
 public class Main {
 
@@ -436,3 +432,173 @@ add result:12
 delta result:8
 
 ```
+
+- IDE(Integrated Development Environment)
+    - テキストエディタ、コンパイラ(javac)、インタプリタ(java)全てを内蔵したもの
+
+- エディタでコードを書いたり上書きすると自動的にコンパイルされる
+
+```
+
+---
+
+- 復習
+
+- 以下のプログラムを分割する
+
+1. Mainクラスにはmainメソッドだけ,クラスの先頭でZenhanクラスだけをインポート
+2. commentパッケージに属するZenhanクラスを作成
+3. commentパッケージに属するkouhanクラスを作成
+
+```
+public class Main {
+    public static void main(String[] args) throws Exception {
+        doWarusa();
+        doTogame();
+        talkBack();
+        showPoliceNotebook();
+    }
+
+    public static void doWarusa() {
+        System.out.println("A: do mischief");
+    }
+
+    public static void doTogame() {
+        System.out.println("B: blame it");
+    }
+
+    public static void talkBack() {
+        System.out.println("A: talk back");
+    }
+
+    public static void showPoliceNotebook() throws Exception {
+        System.out.println("B: show police notebook");
+        doTogame();
+    }
+
+}
+
+// 出力結果
+// kiyota-MacBook-Pro:src kiyotatakeshi$ java Main
+// A: do mischief
+// B: blame it
+// A: talk back
+// B: show police notebook
+// B: blame it
+
+```
+
+- 分割してみる
+
+```
+# Main.java
+
+import comment.Zenhan;
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Zenhan.doWarusa();
+        Zenhan.doTogame();
+        comment.Kouhan.talkBack();
+        comment.Kouhan.showPoliceNotebook();
+    }
+}
+
+
+# Zenhan.java
+
+package comment;
+
+public class Zenhan {
+
+    public static void doWarusa() {
+        System.out.println("A: do mischief");
+    }
+
+    public static void doTogame() {
+        System.out.println("B: blame it");
+    }
+}
+
+# Kouhan.java
+
+package comment;
+
+public class Kouhan {
+
+    public static void talkBack() {
+        System.out.println("A: talk back");
+    }
+
+    public static void showPoliceNotebook() throws Exception {
+        System.out.println("B: show police notebook");
+        comment.Zenhan.doTogame();
+    }
+}
+
+```
+
+- 実行
+
+```
+kiyota-MacBook-Pro:src kiyotatakeshi$ javac Main.java Zenhan.java Kouhan.java
+
+kiyota-MacBook-Pro:src kiyotatakeshi$ ls
+Kouhan.class    Kouhan.java     Main.class      Main.java       Zenhan.class    Zenhan.java
+
+kiyota-MacBook-Pro:src kiyotatakeshi$ pwd
+/Users/kiyotatakeshi/Desktop/Java/classPractice/src
+
+kiyota-MacBook-Pro:src kiyotatakeshi$ mkdir -p work/commet
+
+kiyota-MacBook-Pro:src kiyotatakeshi$ mv Zenhan.class Kouhan.class work/commet/
+kiyota-MacBook-Pro:src kiyotatakeshi$ mv Main.class work/
+
+kiyota-MacBook-Pro:src kiyotatakeshi$ tree -L 3 work/
+work/
+├── Main.class
+└── commet
+    ├── Kouhan.class
+    └── Zenhan.class
+
+1 directory, 3 files
+kiyota-MacBook-Pro:src kiyotatakeshi$ cd work/
+
+kiyota-MacBook-Pro:work kiyotatakeshi$ pwd
+/Users/kiyotatakeshi/Desktop/Java/classPractice/src/work
+
+kiyota-MacBook-Pro:work kiyotatakeshi$ ls
+Main.class      comment
+
+kiyota-MacBook-Pro:work kiyotatakeshi$ tree
+.
+├── Main.class
+└── comment
+    ├── Kouhan.class
+    └── Zenhan.class
+
+1 directory, 3 files
+
+kiyota-MacBook-Pro:work kiyotatakeshi$ java Main
+A: do mischief
+B: blame it
+A: talk back
+B: show police notebook
+B: blame it
+
+```
+
+- showPoliceNotebook に3秒待ち時間を入れる
+
+```
+    public static void showPoliceNotebook() throws Exception {
+        System.out.println("B: show police notebook");
+
+        // java.lang.Threadクラスのメソッドを呼び出す
+        Thread.sleep(3000);
+        comment.Zenhan.doTogame();
+    }
+
+```
+
+- javacコマンドは「どのソースファイルをコンパイルするか」をファイル名で指定
+- javaコマンドは「どのクラスのmainメソッドを起動するか」をクラス名(FQCN)で指定
