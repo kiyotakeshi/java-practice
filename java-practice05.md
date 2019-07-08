@@ -369,4 +369,44 @@ public class Main {
     - 仮想世界で活動するのはインスタンス
     - インスタンスを生み出すための金型がクラス
 
+- 聖職者を表現するクラス
 
+```
+import java.util.*
+
+public class Cleric {
+
+    // 属性を定義
+    String name;
+    int hp = 50;
+    int mp = 10;
+    final int MAX_HP = 50;
+    final int MAX_MP = 10;
+
+    // MPを5消費しHPを全回復
+    public void selfAid() {
+        System.out.println("selfAid: mp -5 / hp is full..");
+        this.hp = this.MAX_HP;
+        this.mp -= 5;
+    }
+
+    // 祈った秒数 + (0~2) の値MPを回復
+    // 戻り値はint(回復するmp)
+    public int pray(int sec) {
+        System.out.println(this.name + " is praying " + sec + "seconds");
+
+        // 論理上の回復量を乱数を用いて決定
+        int recover = new Random().nextInt(3) + sec;
+
+        // 実際の回復量を決定(mpの上限を超えない)
+        // Math.min(a, b)は小さい方の値を返す
+        // ex) 10(MAX_MP)-8(mp), 5(recover) の場合は2が返ってくる
+        int recoverActual = Math.min(this.MAX_MP - this.mp, recover);
+
+        this.mp += recoverActual;
+        System.out.println("MP: +" + recoverActual);
+        return recoverActual;
+    }
+}
+
+```
