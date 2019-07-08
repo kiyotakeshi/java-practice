@@ -89,3 +89,139 @@
 
     - 現実世界のお店や史跡名勝を再現した「観光地」オブジェクト
         - 名所の名前、住所、電話番号、解説といった属性
+
+---
+
+- オブジェクトを生み出す手順
+
+1. クラス(オブジェクトを生成する際に用いる設計図)を定義
+    - プログラマがオブジェクトそのものを定義できない
+
+2. クラスに基づいてオブジェクトを生成
+    - 必要な数だけ何個でもオブジェクトを生み出せる
+    - 金型を作っておきプラスティックを流し込み大量生産するイメージ
+
+- **仮想世界の中で活躍するのはオブジェクトだけで、金型であるクラスは基本的には活動しない**
+    - クラスを指しているのかオブジェクトを指しているのか混合して使われることも
+    - 仮想世界で活動する実体(オブジェクト)を厳密に示したい場合は、インスタンスと表現する
+
+- クラスからインスタンス(オブジェクト)を生成する行為を「インスタンス化」と表現する
+
+---
+
+- 冒険プログラムを作ってみる
+    - HeroクラスとMatangoクラスだけではインスタンスは指示待ちでやることがない(操作の呼び出しがないため)
+    - 神様の指示である天の声はMainクラスのmainメソッドとして記述する
+    - Hero,Matangoクラス内にmainメソッドを同居させることも可能だがわかりにくくなるため非推奨
+    - イメージ「神様のクラス」と「登場人物のクラス」
+
+- 登場人物クラスの作り方
+    - 設計内容をクラス名、属性、操作の一覧として並べる
+    - クラス図というUML(Unified Modeling Language)で定められている世界共通の書き方
+
+- Heroクラス
+
+```
+Hero.java
+
+package work;
+
+// クラスブロック内で宣言された変数をフィールドという
+
+public class Hero {
+    // 属性の宣言
+    String name;
+    int hp;
+}
+
+```
+
+```
+Mantango.java
+
+package work.comment;
+
+public class Matango {
+    int hp;
+    // 宣言と同時に初期値も設定
+    // int level = 10;
+
+    // フィールド宣言の先頭にfinalをつけると定数フィールドになる
+    final int LEVEL = 10; // 定数は大文字で記述
+}
+
+```
+
+- 操作をプログラミングする時に必要な情報
+1. 名前
+2. 必要な情報の一覧
+3. 結果として指示元に返す情報
+4. 処理内容
+
+```
+Hero.java
+
+package work;
+
+// クラス名は単語の頭を大文字
+public class Hero {
+    String name;
+    int hp;
+
+    void sleep() {
+
+        // 自分自身のhpフィールド
+        // thisは特別な変数で自分自身をさす
+        // . は「〜の」くらいのイメージ
+        // 自分自身のインスタンスのhpフィールドに100を代入
+        this.hp = 100;
+
+        // thisはなくてもエラーにはならないが
+        // ローカル変数や引数と区別するために、フィールドを用いる時は必ずつける！
+        System.out.println(this.name + "is sleeping and healing");
+
+    }
+}
+
+```
+
+- Heroクラスの定義
+
+```
+Hero.java
+
+package work;
+
+public class Hero {
+    String name;
+    int hp;
+
+    // sleepメソッド
+    void sleep() {
+        this.hp = 100;
+        System.out.println(this.name + "is sleeping and healing");
+    }
+
+    // 何秒座るかを引数で受け取る
+    void sit(int sec) {
+        this.hp += sec;
+        System.out.println(this.name + " sat " + sec + "seconds");
+        System.out.println("HP " + sec + "points heal");
+    }
+
+    void slip() {
+        this.hp -= 5;
+        System.out.println(this.name + "is slipping");
+        System.out.println("5 points damage");
+    }
+
+    void run() {
+        System.out.println(this.name + "is running away");
+        System.out.println("GAME OVER");
+        System.out.println("Finaly, HP is " + this.hp + "points");
+    }
+}
+
+```
+
+- 
