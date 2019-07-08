@@ -124,8 +124,6 @@
 ```
 Hero.java
 
-package work;
-
 // クラスブロック内で宣言された変数をフィールドという
 
 public class Hero {
@@ -138,8 +136,6 @@ public class Hero {
 
 ```
 Mantango.java
-
-package work.comment;
 
 public class Matango {
     int hp;
@@ -160,8 +156,6 @@ public class Matango {
 
 ```
 Hero.java
-
-package work;
 
 // クラス名は単語の頭を大文字
 public class Hero {
@@ -189,8 +183,6 @@ public class Hero {
 
 ```
 Hero.java
-
-package work;
 
 public class Hero {
     String name;
@@ -224,4 +216,157 @@ public class Hero {
 
 ```
 
-- 
+- クラスの定義により可能になること
+
+1. そのクラスに基づいてインスタンスを生成できるようになる
+
+2. そのクラスから生まれたインスタンスを入れる変数の型が利用できるようになる
+    - Heroクラスを定義するとHero型の変数が利用できるようになる
+    - クラスを定義すると利用可能になる型を「クラス型」と呼ぶ
+
+- クラス型について
+    - intなどはJavaが標準で準備している型
+    - クラスを定義すると利用可能な型の種類が増える
+    - インスタンスは通常、クラス型変数に入れて利用する
+        - クラスから生成された同名インスタンスをプログラム的に識別するため
+
+- 神様クラスをつくっていく
+
+```
+Main.java
+
+public class Main {
+    public static void main(String[] args) {
+
+        // インスタンスの生成
+        // new Hero() でHeroクラスからインスタンスを生成し
+        // Hero型変数hに代入
+        Hero h = new Hero();
+        // わけてかくなら
+        // Hero h;
+        // h = new Hero();
+    }
+}
+
+```
+
+- 生成したインスタンスのフィールドに値を代入
+
+```
+public class Main {
+    public static void main(String[] args) {
+
+        Hero h = new Hero();
+        // フィールド値を取得し初期値をセット
+        h.name = "Mike";
+        h.hp = 100;
+        System.out.println("Hero " + h.name + "is genetated");
+
+    }
+}
+
+```
+
+- インスタンスのメソッド呼び出し
+    - mainメソッドの内容が台本のようにわかりやすい
+    - 勇者を登場させ、操作しているだけ
+
+    - 細かい処理は出てこない
+        - ex) HPを増やしたり減らしたりする細かい計算処理
+        - ex) 戦闘中に画面にどのメッセージを出すか
+
+```
+public class Main {
+    public static void main(String[] args) {
+
+        Hero h = new Hero();
+        h.name = "Mike";
+        h.hp = 100;
+        System.out.println("Hero " + h.name + " is genetated");
+
+        h.sit(5);
+        h.slip();
+        h.sit(25);
+        h.run();
+
+        // Hero Mike is genetated
+        // Mike sat 5 seconds
+        // HP 5 points heal!
+        // Mike is slipping
+        // 5 points damage!
+        // Mike sat 25 seconds
+        // HP 25 points heal!
+        // Mike is running away
+        // GAME OVER
+        // Finaly, HP is 125points
+    }
+}
+
+```
+
+- おばけきのこ2匹を生み出す
+
+```
+Mantango.java
+
+package work;
+
+public class Matango {
+    int hp;
+    final int LEVEL = 10;
+    char suffix;
+    void run(){
+        System.out.println("Matango "+ this.suffix + " is running away");
+    }
+}
+
+```
+
+```
+Main.java
+
+public class Main {
+    public static void main(String[] args) {
+
+        Hero h = new Hero();
+        h.name = "Mike";
+        h.hp = 100;
+
+        // おばけきのこ1匹目を生成し初期化
+        Matango m1 = new Matango();
+        m1.hp = 50;
+        m1.suffix = 'A';
+
+        Matango m2 = new Matango();
+        m2.hp = 48;
+        m2.suffix = 'B';
+
+        // 冒険の始まり
+        h.slip();
+        m1.run();
+        m2.run();
+        h.run();
+
+        // Mike is slipping
+        // 5 points damage!
+        // Matango A is running away
+        // Matango B is running away
+        // Mike is running away
+        // GAME OVER
+        // Finaly, HP is 95points
+    }
+}
+
+```
+
+- 手続き型プログラミングとオブジェクト指向のクラスやメソッドは思想の有無が違う
+    - 手続き型のそれは開発者の都合や機能の単位(対応する現実がない)
+    - オブジェクト指向だと現実世界と意味がつながった(対応した)クラス
+
+---
+
+- 復習
+    - 仮想世界で活動するのはインスタンス
+    - インスタンスを生み出すための金型がクラス
+
+
