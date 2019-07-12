@@ -249,4 +249,100 @@ public class Weapon extends Item {
 
 ---
 
-- 
+- 正しい継承、間違った継承
+    - (子クラス) is-a (親クラス) の原則に乗っ取って継承する
+    - 子クラスは親クラスの一種である状態
+    - SuperHeroはHeroの一種
+
+- Itemクラス(勇者の持ち物)を継承してHouseクラスを作れるが Houser is-a Item にはならない(持ち歩かない)
+
+- 間違った継承は将来的にクラスを拡張する時に現実世界との矛盾が生じるから
+- 多態性を利用できなくなるから
+
+```
+public class Item {
+
+    // 敵に投げつけた時のダメージ
+    // これをHouseメソッドに継承すると
+    // 家を投げることになり現実に即していない
+    // HouseクラスにあるgetDamage()は無視して使わないようにするのように
+    // 存在するけど使ってはいけないメンバがあるクラスは作らない！
+    public int getDamage(){
+        return 10;
+    }
+}
+
+```
+
+- 親クラスになるほど一般的で抽象的なもの(汎化),子クラスになるほど特殊で具体的なもの(特化)になる
+- 特化するほど詳細にフィールドやメソッドを定めることができ、メンバは増えていく
+- 汎化するほどフィールドやメソッドを多く定めることは難しくなる
+- 継承はある2つのクラスに特化、汎化の関係があることを示すための道具でもある
+
+---
+
+- 復習
+
+
+```
+// 親クラスと子クラスの例
+
+Device -> Phone -> SmartPhone
+Vehicle -> Car -> TeslaCar
+Book -> Dictionary -> EnglishDictionary
+
+```
+
+```
+// 以下のクラスを元にPoisonMatangoクラスを作成
+public class Matango {
+    int hp = 50;
+    private char suffix;
+
+    public Matango(char suffix) {
+        this.suffix = suffix;
+    }
+
+    public void attack(Hero h) {
+        System.out.println("Matango" + this.suffix + " attack");
+        System.out.println("10points damage");
+        h.setHP(h.getHp() - 10);
+    }
+}
+
+```
+
+```
+public class PoisonMatango extends Matango {
+
+    // 毒攻撃が可能な回数
+    private int poisonCount = 5;
+
+    // PoisonMatango pm = new PoisonMatango('A'); でインスタンス化できるように記述
+    public PoisonMatango(char suffix) {
+        super(suffix);
+    }
+
+    //
+    public void attack(Hero h) {
+
+        // 親インスタンス部のattack()の呼び出し
+        super.attack(h);
+
+        // 追加での毒攻撃
+        if (this.poisonCount > 0) {
+            System.out.println("extra poison attack! ");
+
+            // Heroのhpの 1/5 を引く
+            int dmg = h.getHp() / 5;
+            h.setHp(h.getHp() - dmg);
+            System.out.println(dmg + "points extra damage!");
+
+            // 毒攻撃の回数が減る
+            this.poisonCount--;
+        }
+    }
+
+}
+
+```
