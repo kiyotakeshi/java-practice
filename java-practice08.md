@@ -143,11 +143,13 @@ public class Main {
 
 ```
     public void attack(Matango m) {
+
         // 親インスタンス部のattack()の呼び出し
         // superとは親インスタンスを表す予約語
         // これを利用すると親インスタンス部のメソッドやフィールドに子インスタンスからアクセスできる
         super.attack(m);
         if (this.flying) {
+
             // 親インスタンス部のattack()の呼び出し
             super.attack(m);
 
@@ -158,3 +160,93 @@ public class Main {
     }
 
 ```
+
+- 継承を利用したクラスの作られ方
+
+```
+public class Hero {
+    public Hero(){
+        System.out.println("Hero class constructor function");
+    }
+}
+
+public class SuperHero extends Hero {
+    public SuperHero(){
+        // 明示的に親コンストラクタを呼び出す
+        // super();
+        // コンパイラが自動的に super(); を挿入する
+        // つまりコンストラクタは内側のインスタンス部分のものから順に呼ばれていく
+        System.out.println("SuperHero constructor function");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        SuperHero sh = new SuperHero();
+
+        // 実行結果
+        // Hero class constructor function
+        //SuperHero constructor function
+        // 全てのコンストラクタは先頭で必ず内部インスタンス部(親クラス)のコンストラクタを呼び出す
+    }
+}
+```
+
+- 親インスタンスが作れない状況
+    - 以下のコードはエラーになる
+
+```
+public class Item {
+    private String name;
+    private int price;
+
+    public Item(String name){
+        this.name = name;
+        this.price = 0;
+    }
+
+    // 引数2つのコンストラクタ
+    public Item(String name, int price){
+        this.name = name;
+        this.price = price;
+    }
+}
+
+public class Weapon extends Item {
+    // 見えないけどこれがついている
+    // 親コンストラクタを呼び出すを呼び出そうとする
+    // super();
+}
+
+
+public class Main {
+    public static void main(String[] args) {
+
+        // Weaponインスタンスを生成しようとする
+        // Itemクラスを継承しているため
+        // 内部にItemインスタンスを含む多重構造になるはず
+        // コンストラクタの定義がないのでデフォルトコンストラクタが定義され動作
+        // super(); により親クラスのItemのコンストラクタを引数なしで呼ぼうとする
+        // Itemクラスのコンストラクタには引数0のコンストラクタは存在しないため呼び出しに失敗
+        Weapon w = new Weapon();
+    }
+}
+
+```
+
+- 以下のように修正すればエラーにならない
+
+```
+public class Weapon extends Item {
+   public Weapon(){
+       // 内部インスタンスの初期化を行うコンストラクタ Item()に
+       // 引数を明示的に与える
+       super("normal sword")
+    }
+}
+
+```
+
+---
+
+- 
