@@ -1,19 +1,25 @@
-- 継承
-    - 以前と似たクラスを効率よく作る
-    - 元クラスの差分だけを記述して新たにクラス宣言できる
+### 継承
+
+- 以前と似たクラスを効率よく作る
+- 元クラスの差分だけを記述して新たにクラス宣言できる
 
 - 継承しないと発生する問題
     - 元クラスの変更点を全ての同じように作ったクラスに反映させる必要がある
     - ソースコードが重複し、把握や管理が難しくなる
 
+---
+- 継承を使ってみる
+
 ```
 // ベースとなるクラス
 
 public class Hero {
+
     private String name = "Mike";
     private int hp = 100;
 
     public void attack(Matango m) {
+
         System.out.println(this.name + "attack");
         m.hp -= 5;
         System.out.println("5points damage!");
@@ -27,10 +33,10 @@ public class Hero {
 ```
 
 ```
-// 継承を使い
-// 空をとび、着地できるSuperHeroを作成
+// 継承を使い、空をとび着地できるSuperHeroを作成
 
 public class SuperHero extends Hero {
+
     private boolean flying;
 
     public void fly() {
@@ -57,11 +63,12 @@ public class Main {
 }
 
 ```
+- 複数のクラスを親として定義する多重継承は基本的にはJavaでは使えない(インターフェースだと可)
 
-- 複数のクラスを親として定義する多重継承はJavaでは使えない
+---
+### オーバーライド
 
-- オーバーライド
-    - 子クラスでメソッドを再定義(上書き)する
+- 子クラスでメソッドを再定義(上書き)する
 
 ```
 public class SuperHero extends Hero {
@@ -71,8 +78,10 @@ public class SuperHero extends Hero {
 
     // SuperHeroクラスのメソッドの動きだけかえる
     public void run() {
+
         // 親クラスでは以下のように記述されている
         // System.out.println(this.name + "escape");
+
         System.out.println("escape");
     }
 }
@@ -92,10 +101,11 @@ public class Main {
 
 ```
 
+---
 - finalが付いているクラスは継承ができない
     - stringクラスは継承できない
 
-- finalが付いているメソッドは子クラスでオーバーライドできない
+- **finalが付いているメソッドは子クラスでオーバーライドできない**
 
 ```
     // finalが付いているメソッドは子クラスでオーバーライドできない
@@ -112,18 +122,19 @@ public class Main {
 
 ```
 
+---
 - SuperHeroインスタンスは内部にHeroクラスから生まれたHeroインスタンスを含んでいる二重構造になっている
     - 外側を「子インスタンス部分」、内側を「親インスタンス部分」
-    - インスタンスの外部からメソッドの呼び出しがあると、極力外側にある子インスタンス部分で対応
+    - **インスタンスの外部からメソッドの呼び出しがあると、極力外側にある子インスタンス部分で対応**
     - オーバライドしている場合は親クラスの呼び出しに届かないから上書きされたように見える
 
+---
 - 内側の親クラスに属するインスタンスが活躍する場合
 
 ```
-
     // 空を飛んでいる状態でattackすると2回攻撃できる
     // この書き方だとHeroクラスのattack()メソッドのダメージが
-    //一回で10に修正されても5ポイントダメージを二回できるだけ
+    // 1回で10に修正されても5ポイントダメージを二回できるだけ
     public void attack(Matango m) {
 
         // 1回目の攻撃
@@ -162,19 +173,25 @@ public class Main {
 
 ```
 
-- 継承を利用したクラスの作られ方
+---
+### 継承を利用したクラスの作られ方
 
 ```
 public class Hero {
+
+    // コンストラクター
     public Hero(){
         System.out.println("Hero class constructor function");
     }
 }
 
 public class SuperHero extends Hero {
+
     public SuperHero(){
+
         // 明示的に親コンストラクタを呼び出す
         // super();
+
         // コンパイラが自動的に super(); を挿入する
         // つまりコンストラクタは内側のインスタンス部分のものから順に呼ばれていく
         System.out.println("SuperHero constructor function");
@@ -183,16 +200,20 @@ public class SuperHero extends Hero {
 
 public class Main {
     public static void main(String[] args) {
+
         SuperHero sh = new SuperHero();
 
         // 実行結果
         // Hero class constructor function
-        //SuperHero constructor function
-        // 全てのコンストラクタは先頭で必ず内部インスタンス部(親クラス)のコンストラクタを呼び出す
+        // SuperHero constructor function
     }
 }
+
 ```
 
+- **全てのコンストラクタは先頭で必ず内部インスタンス部(親クラス)のコンストラクタを呼び出す**
+
+---
 - 親インスタンスが作れない状況
     - 以下のコードはエラーになる
 
@@ -249,16 +270,15 @@ public class Weapon extends Item {
 ```
 
 ---
+### 正しい継承、間違った継承
 
-- 正しい継承、間違った継承
-    - (子クラス) is-a (親クラス) の原則に乗っ取って継承する
+- (子クラス) is-a (親クラス) の原則に乗っ取って継承する
     - 子クラスは親クラスの一種である状態
     - SuperHeroはHeroの一種
 
-- Itemクラス(勇者の持ち物)を継承してHouseクラスを作れるが Houser is-a Item にはならない(持ち歩かない)
-
-- 間違った継承は将来的にクラスを拡張する時に現実世界との矛盾が生じるから
-- 多態性を利用できなくなるから
+- Itemクラス(勇者の持ち物)を継承してHouseクラスを作れるが House is-a Item にはならない(持ち歩かない)
+    - 間違った継承は将来的にクラスを拡張する時に現実世界との矛盾が生じるから
+    - 多態性を利用できなくなるから
 
 ```
 public class Item {
@@ -266,24 +286,25 @@ public class Item {
     // 敵に投げつけた時のダメージ
     // これをHouseメソッドに継承すると
     // 家を投げることになり現実に即していない
-    // HouseクラスにあるgetDamage()は無視して使わないようにするのように
-    // 存在するけど使ってはいけないメンバがあるクラスは作らない！
     public int getDamage(){
         return 10;
+
+    // HouseクラスにあるgetDamage()は無視して使わないようにするのようにするという対策もあるが、
+    // 存在するけど使ってはいけないメンバがあるクラスは作らない！
     }
 }
 
 ```
 
+---
 - 親クラスになるほど一般的で抽象的なもの(汎化),子クラスになるほど特殊で具体的なもの(特化)になる
-- 特化するほど詳細にフィールドやメソッドを定めることができ、メンバは増えていく
-- 汎化するほどフィールドやメソッドを多く定めることは難しくなる
-- 継承はある2つのクラスに特化、汎化の関係があることを示すための道具でもある
+    - 特化するほど詳細にフィールドやメソッドを定めることができ、メンバは増えていく
+    - 汎化するほどフィールドやメソッドを多く定めることは難しくなる
+
+- **継承はある2つのクラスに特化、汎化の関係があることを示すための道具でもある**
 
 ---
-
 - 復習
-
 
 ```
 // 親クラスと子クラスの例
@@ -297,6 +318,7 @@ Book -> Dictionary -> EnglishDictionary
 ```
 // 以下のクラスを元にPoisonMatangoクラスを作成
 public class Matango {
+
     int hp = 50;
     private char suffix;
 
@@ -319,12 +341,12 @@ public class PoisonMatango extends Matango {
     // 毒攻撃が可能な回数
     private int poisonCount = 5;
 
+    // コンストラクタの設定
     // PoisonMatango pm = new PoisonMatango('A'); でインスタンス化できるように記述
     public PoisonMatango(char suffix) {
         super(suffix);
     }
 
-    //
     public void attack(Hero h) {
 
         // 親インスタンス部のattack()の呼び出し
