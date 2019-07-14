@@ -231,6 +231,9 @@ public interface Creature {
 
 - なぜインターフェースというのか
     - 店頭メニューのようにできることを表明して、お客さんとの接点(interface)と役割だから
+    - 全国チェーンのクリーニング店の店頭メニューをインターフェースでつくる
+    - チェーン店の各店舗の設備やメニューは違う部分もあるので
+    - 個々の CleaningShopクラスで抽象メソッドをオーバーライドして実装
 
 ```
 // シャツ、タオル、コートを渡すと洗って返してくれる
@@ -276,6 +279,320 @@ public class KyotoCleaningShop implements CleaningService {
     // 抽象メソッドをオーバーライドする
     public Coat washCoat(Coat c) {
         return c;
+    }
+}
+
+```
+
+- インターフェースを使うと実現できること
+    - 同じインターフェースをimplementsする子クラスに共通のメソッド群を実装することを矯正できる
+    - インターフェースを実装していれば、そのインターフェースが定めたメソッドを持っていることが保証される
+
+- インターフェースが特別扱いされるのは、内部実装を(メソッドの処理動作)を一切定めていないから
+
+- インターフェースでは特別に多重継承(クラス作成を2つのクラスから行うことができる)が許可されている
+    - 例) Creatureクラスから継承されたPrincessクラスとHeroクラスを元にPrincessHeroクラスをつくる
+    - インターフェースにはメソッドの処理内容が書かれていないので、複数の継承元のメソッドが競合することがない
+    - 勇者かつお嬢様の独自のメソッドとしてオーバライドする
+
+```
+public class PrincessHero {
+
+    // 3つのインターフェースから多重継承
+    implements Hero, Princess, Character {
+
+    }
+}
+
+```
+
+- インターフェースの継承
+
+```
+// 既存のインターフェースを元にして新たなインターフェースを定義
+// HumanはCreatureのメソッドをオーバーライドしているわけではないので
+// implementsではなくextendsを使う
+public interface Human extends Creature {
+    void talk();
+    void watch();
+    void hear();
+
+}
+
+```
+
+- extends,implementsを一緒に使う
+
+```
+public class Fool extends Character implements Human {
+    // CharactorからhpやgetName()などのメンバを継承
+
+    // Characterから継承した抽象メソッドattack()を実装
+    public void attack(Matango m){
+        System.out.println(this.getName() + "doesn't fight");
+    }
+
+    // Humanから継承した4つの抽象メソッドを実装
+    public void talk(){}
+    public void watch(){}
+    public void hear(){}
+    public void run(){}
+}
+
+```
+
+---
+- 振り返り
+
+- 他の人が継承の材料として使うであろう親クラスを作る立場の開発もある
+    - 抽象クラスやインターフェースを使う
+    - 未来の開発者が効率よく安心して利用できる継承の材料を作る
+
+- 抽象クラス
+    - 中身を決定できない詳細未定メソッドにはabstractをつけて抽象メソッドとする
+    - 抽象メソッドを一つでも含んでいるとabstractをつける
+    - 抽象クラスはインスタンス化できない
+    - 抽象クラスと抽象メソッドを継承の材料として開発すれば、予期しないインスタンス化やオーバーライド忘れを防げる
+
+- インターフェース
+    - 抽象メソッドしか持たないものをインターフェースとして特別扱いできる
+    - public abstruct となりフィールドは public static final になる
+    - 複数のインターフェースを親とする多重継承が許されている
+    - インターフェースを親に持つ子クラスの定義にはimplementsを用いる
+
+- まとめ
+
+- 様々な形ある資産を管理するために有形資産という名前の抽象クラスを作成する
+
+```
+public class Book {
+    private String name;
+    private int price;
+    private String color;
+    private String isbn;
+
+    // コンストラクタ
+    public Book(String name, int price, String color, String isbn) {
+        this.name = name;
+        this.price = price;
+        this.color = color;
+        this.isbn = isbn;
+    }
+
+    // getterメソッド
+    public String getName() {
+        return this.name;
+    }
+
+    public int getPrice() {
+        return this.price;
+    }
+
+    public String getColor() {
+        return this.color;
+    }
+
+    public String getIsbn() {
+        return this.isbn;
+    }
+
+}
+
+```
+
+```
+public class Computer {
+    private String name;
+    private int price;
+    private String color;
+    private String makerName;
+
+    // コンストラクタ
+    public Computer(String name, int price, String color, String makerName) {
+        this.name = name;
+        this.price = price;
+        this.color = color;
+        this.makerName = makerName;
+    }
+
+    // getterメソッド
+    public String getName() {
+        return this.name;
+    }
+
+    public int getPrice() {
+        return this.price;
+    }
+
+    public String getColor() {
+        return this.color;
+    }
+
+    public String getMakerName() {
+        return this.makerName;
+    }
+}
+
+```
+
+- 抽象クラスを作成(TangibleAsset)
+
+```
+// 抽象クラス
+public abstract class TangibleAsset {
+    private String name;
+    private int price;
+    private String color;
+
+    // コンストラクタ
+    public TangibleAsset(String name, int price, String color) {
+        this.name = name;
+        this.price = price;
+        this.color = color;
+    }
+
+    // getterメソッド
+    public String getName() {
+        return name;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public String getColor() {
+        return color;
+    }
+}
+
+```
+
+
+```
+public class Book extends TangibleAsset {
+    private String isbn;
+
+    // コンストラクタ
+    public Book(String name, int price, String color, String isbn) {
+
+        // superとは親インスタンスを表す予約語
+        // これを利用すると親インスタンス部の
+        // メソッドやフィールドに子インスタンスからアクセスできる
+        super(name, price, color);
+        this.isbn = isbn;
+    }
+
+    public String getIsbn() {
+        return this.isbn;
+    }
+
+}
+
+```
+
+```
+public class Computer extends TangibleAsset {
+    private String makerName;
+
+    // コンストラクタ
+    public Computer(String name, int price, String color, String makerName) {
+
+        // 親クラスのメソッドやフィールドにアクセス
+        super(name, price, color);
+        this.makerName = makerName;
+    }
+
+    // getterメソッド
+
+    public String getMakerName() {
+        return this.makerName;
+    }
+}
+
+```
+
+- 形のない無形資産(IntangibleAsset)も管理する(特許権,Patentなど)
+    - 親クラスとなる Assetクラスをつくる
+
+```
+// インターフェースは全てのメソッドが抽象メソッドでフィールドを一つも持たない時に使用可能
+// 抽象メソッドを持つ抽象クラスを宣言
+
+public abstract class Asset {
+    private String name;
+    private int price;
+
+    // コンストラクタ
+    public Asset(String name, int price) {
+        this.name = name;
+        this.price = price;
+    }
+
+    // getterメソッド
+    public String getName() {
+        return name;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+}
+
+```
+
+```
+// 抽象クラス
+public abstract class TangibleAsset extends Asset {
+    private String color;
+
+    // コンストラクタ
+    public TangibleAsset(String name, int price, String color) {
+        super(name, price);
+        this.color = color;
+    }
+
+    public String getColor() {
+        return this.color;
+    }
+}
+
+```
+
+- 資産かは関係なく、形のあるもの(Thing)の重さを定義する
+    - getWeight(),setWeight()を持つインターフェースを定義
+
+```
+public interface Thing {
+    double getWeight();
+    void setWeight(double weight);
+}
+
+```
+
+- 有形資産(TangibleAsset)は資産(Asset)の一種であり形あるもの(Thing)の一種でもある
+
+```
+// 抽象クラス
+public abstract class TangibleAsset extends Asset implements Thing {
+    private String color;
+    private double weight;
+
+    // コンストラクタ
+    public TangibleAsset(String name, int price, String color) {
+        super(name, price);
+        this.color = color;
+    }
+
+    public String getColor() {
+        return this.color;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
     }
 }
 
