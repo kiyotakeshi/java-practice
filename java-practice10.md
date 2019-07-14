@@ -129,7 +129,7 @@ public class Main {
 - メソッドを呼び出せた場合う動く処理
 
 ```
-public class Monster {
+public abstract class Monster {
     public void run(){
         System.out.println("Monster escaped");
     }
@@ -138,7 +138,7 @@ public class Monster {
 ```
 
 ```
-public class Slime {
+public class Slime extends Monster {
     public void run(){
         System.out.println("Slime escaped");
     }
