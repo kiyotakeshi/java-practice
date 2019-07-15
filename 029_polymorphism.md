@@ -1,35 +1,36 @@
-- 多態性(ポリモーフィズム)
-    - ざっくりと捉えることでメリットを享受する
+### 多態性(ポリモーフィズム)
+
+- ざっくりと捉えることでメリットを享受する
     - 厳密に言えばSuperHeroだけどざっくりとはHeroだよね的な
     - 現実においてもレンタカーで初めて乗る車でも問題なく運転できる(ざっくりとは同じ車)
-    - 多態性に専用の文法はない
 
-
-- SuperHeroのインスタンスを生成
-    - SuperHero型の変数hにSuperHeroインスタンスが入っている
+- 多態性に専用の文法はない
 
 ```
+// SuperHeroのインスタンスを生成
+// SuperHero型の変数hにSuperHeroインスタンスが入っている
+
 SuperHero h = new SuperHero();
 
-```
-
-- ざっくりとCharacterとして捉える書き方
-    - 左辺の型がCharacterに変わった
-    - インスタンスはSuperHeroだが、箱の正面にはCharacterと書いているイメージ
-    - 本当はSuperHeroインスタンスだが、Characterとして捉えることが可能
-    - 多態性の活用には箱の型と中身の型が異なることが関係
-    - インスタンスをどのように捉えるかはどの型の変数に代入するか(箱の型)できまる
-
-```
-// SuperHero is-a Character のため代入可能
-// 絵に描いてみて嘘にならないインスタンスの代入は可能(Characterの箱にSuperHero)
-// is-a の関係をJavaで記述するのが、extendsやimplements
+// ざっくりとCharacterとして捉える書き方
+// 左辺の型がCharacterに変わった
+// インスタンスはSuperHeroだが、箱の正面にはCharacterと書いているイメージ
+// 本当はSuperHeroインスタンスだが、Characterとして捉えることが可能
 
 Character c = new SuperHero();
 
 ```
 
+- 多態性の活用には箱の型と中身の型が異なることが関係
+
+- インスタンスをどのように捉えるかはどの型の変数に代入するか(箱の型)できまる
+    - SuperHero is-a Character のため代入可能
+    - 絵に描いてみて嘘にならないインスタンスの代入は可能(Characterの箱にSuperHero)
+    - is-a の関係をJavaで記述するのが、extendsやimplements
+
+---
 - 箱の型に抽象クラスやインターフェースを使う
+    - **抽象クラスやインターフェースからインスタンスを生み出すことはできないが、型を利用することは可能**
 
 ```
 public interface Life {
@@ -50,14 +51,16 @@ public class Main {
 
 ```
 
+---
 - 同一である存在に対して複数の異なる捉え方ができる
     - あいまいな「紙」は用途が限定される
     - 少し具体的な「絵」は紙の用途に加え、見て楽しむことができる
     - 具体的な「紙幣」は紙の用途に加え、絵の用途に加え、物が買える
     - あいまいで抽象的な物ほど用途は限定され、具体的に捉えるほど用途が増えていく
 
-- 捉え方が変わると利用法も変わる
-    - 呼び出せるメソッドの変化
+---
+- 呼び出せるメソッドの変化
+    - 捉え方が変わると利用法も変わる
 
 ```
 // 抽象クラスとしてCharacterを宣言
@@ -76,6 +79,7 @@ public abstract class Character {
 
 ```
 public class Wizard extends Character {
+
     int mp;
 
     public void attack(Matango m) {
@@ -91,6 +95,7 @@ public class Wizard extends Character {
         this.mp -= 5;
     }
 }
+
 ```
 
 ```
@@ -126,7 +131,8 @@ public class Main {
 
 ```
 
-- メソッドを呼び出せた場合う動く処理
+---
+- メソッドを呼び出せた場合に動く処理
 
 ```
 public abstract class Monster {
@@ -155,21 +161,22 @@ public class Main {
         // 今回は抽象クラスのMonsterにrun()メソッドがあり、それをSlimeでオーバライドしている
         // Monster型のmとSlime型のsは箱の表面の表記の違いはあるものの、中身はあくまでもスライム
         s.run(); // Slime escaped
+
         m.run(); // Slime escaped
     }
 }
 
 ```
 
-- 箱の型(変数の型)はどのメソッドを呼べるかを決定する
-- 中身の型(インスタンス)はメソッドが呼ばれたらどう動くかを決定する
+- **箱の型(変数の型)はどのメソッドを呼べるかを決定する**
+- **中身の型(インスタンス)はメソッドが呼ばれたらどう動くかを決定する**
 
 ---
-
 - 捉え方を変更する
 
 ```
-// Wizardが持つ固有のメソッドは呼べなくなる
+// この処理をすることで、Wizardが持つ固有のメソッドは呼べなくなる
+// Charactorも持つメソッドであれば、Wizardでオーバライドしたものが使えるが…
 Charactor c = new Wizard();
 
 // インスタンスをWizard型変数にするのはエラーになる
@@ -184,6 +191,7 @@ Charactor c = new Wizard();
 
 ```
 Character c = new Wizard();
+
 // 強制的な型変換に使う、キャスト演算子を使用
 Wizard w = (Wizard) c;
 
@@ -194,6 +202,7 @@ Wizard w = (Wizard) c;
 
 ```
 
+---
 - 安全にキャストできるかを判定する
 
 ```
@@ -206,11 +215,11 @@ if (c instanceof SuperHero){
 ```
 
 ---
+### 多態性のメリット
 
-- 多態性のメリット
-    - ざっくりと捉えることで呼び出せるメソッドは減るが、メリットもある
+- ざっくりと捉えることで呼び出せるメソッドは減るが、メリットもある
 
-- 同一視して配列を利用する
+- 同一視して配列を利用できる
     - 5人のキャラクターが旅をする
     - 宿に泊まり、全員のHPを50ずつ回復するプログラムを書く
 
@@ -247,6 +256,7 @@ public class Main {
 
 public class Main {
     public static void main(String[] args) {
+
         Character[] c = new Character[5];
         c[0] = new Hero();
         c[1] = new Hero();
@@ -288,6 +298,7 @@ public class Hero extends Character {
 // 攻撃対象をざっくりとモンスターにすることでコードの重複を排除
 // Monsterクラスを継承しているSlime,Goblinなどのモンスターを攻撃対象にできる
 public class Hero extends Character {
+
     public void attack(Monster m) {
         System.out.println(this.name + " attack");
         System.out.println("10points damage");
@@ -297,7 +308,8 @@ public class Hero extends Character {
 
 ```
 
-- ざっくりまとめて扱う、メソッドの動作は中身の型に従うを組み合わせ
+---
+- **ざっくりまとめて扱う、メソッドの動作は中身の型に従う、を組み合わせる**
     - これぞ多態性の真価
     - 指示する側はいいかげんにうごく、動く側は自分のやり方で動く
 
