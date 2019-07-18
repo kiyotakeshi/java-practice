@@ -158,3 +158,68 @@ public class Main {
 }
 ```
 
+---
+- Map(辞書型)
+    - key,valueのペアで格納するデータ構造
+    - キーを指定して値を読み書きする
+    - 値の重複はできるが、キーは一意のものでないといけない
+
+```
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Map<String, Integer> prefs = new HashMap<String, Integer>();
+
+//      ペアで値を格納
+        prefs.put("kyoto", 255);
+        prefs.put("tokyo", 1261);
+        prefs.put("kumamoto", 181);
+
+//      キーを指定し値を取得
+        int tokyo = prefs.get("tokyo");
+        System.out.println("tokyo population :" + tokyo);
+
+        prefs.remove("kyoto");
+        prefs.put("kumamoto", 182);
+        int kumamoto = prefs.get("kumamoto");
+        System.out.println("kumamoto population:" + kumamoto);
+    }
+}
+```
+
+- HashMapの情報を拡張forで取り出す
+    - キーの一覧を取得、各キーについて対応する値を取得
+
+```
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Integer> prefs = new HashMap<String, Integer>();
+        prefs.put("kyoto", 255);
+        prefs.put("tokyo", 1255);
+        prefs.put("kumamoto", 182);
+
+//      キーの一覧を取得
+        for (String key : prefs.keySet()) {
+
+//          各キーに対応する値を取得
+            int value = prefs.get(key);
+            System.out.println(key + " population:" + value);
+//          kyoto population:255
+//          tokyo population:1255
+//          kumamoto population:182
+        }
+    }
+}
+```
+- HashMapは格納したペア同士の順序を保証しないコレクション
+
+---
+- コレクションのネスト
+
+```
