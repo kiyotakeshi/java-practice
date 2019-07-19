@@ -210,6 +210,8 @@ public class Main {
 //          各キーに対応する値を取得
             int value = prefs.get(key);
             System.out.println(key + " population:" + value);
+
+//          格納したペア同士の順序を保証しないコレクション
 //          kyoto population:255
 //          tokyo population:1255
 //          kumamoto population:182
@@ -220,6 +222,104 @@ public class Main {
 - HashMapは格納したペア同士の順序を保証しないコレクション
 
 ---
-- コレクションのネスト
+- リストに格納されているのは参照
 
+```
+import java.util.ArrayList;
+import java.util.List;
+
+class Hero {
+    public String name;
+}
+
+public class Main {
+    public static void main(String[] args) {
+
+//      インスタンスの生成、メモリ上の番地にhが代入されている
+        Hero h = new Hero();
+        h.name = "Mike";
+
+        List<Hero> list = new ArrayList<Hero>();
+
+//      hをリストに格納
+//      リストに格納されているのはhのアドレス情報
+//      list.get(0)とhは全く同一のインスタンスを指す
+        list.add(h);
+
+//      格納後にhを書き換え
+//      list.get(0).nameと同一のものを書き換えていることになる
+        h.name = "sugawara";
+        System.out.println(list.get(0).name); // sugawara
+    }
+}
+```
+
+---
+### 確認
+
+- ArrayListを使用して順番に名前を取り出す
+
+```
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+
+
+        Hero h1 = new Hero("mike");
+        Hero h2 = new Hero("tom");
+
+        List<Hero> heroes = new ArrayList<Hero>();
+        heroes.add(h1);
+        heroes.add(h2);
+
+        for (Hero h : heroes) {
+            System.out.println(h.getName());
+        }
+    }
+
+}
+```
+
+```
+public class Hero {
+    private String name;
+
+    public Hero(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+}
+```
+
+-  Heroをインスタンス化し、倒した敵の数を勇者とペアでコレクションに格納
+
+```
+import java.util.HashMap;
+
+public class Main {
+    public static void main(String[] args) {
+
+
+        Hero h1 = new Hero("mike");
+        Hero h2 = new Hero("tom");
+
+        Map<Hero, Integer> heroes = new HashMap<Hero, Integer>();
+
+        heroes.put(h1, 3);
+        heroes.put(h2, 7);
+
+        for (Hero key : heroes.keySet()) {
+            int value = heroes.get(key);
+            System.out.println(key.getName() + "knock down " + value);
+
+//          tomknock down 7
+//          mikeknock down 3
+        }
+    }
+}
 ```
