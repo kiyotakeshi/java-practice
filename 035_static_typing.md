@@ -150,4 +150,42 @@ public class Main {
 ```
 
 ---
-### 列挙
+### 列挙型
+
+- 口座種別を指定するクラスの書き方
+    - 3種類の型の指定のみを受け付けたい
+
+```
+//  列挙型で3種類の値だけ入れることができる型を定義
+enum AccountType {
+    FUTSU, TOUZA, TEIKI;
+}
+```
+
+```
+// 口座クラス
+// usage: new Account("15000", AccountType.FUTSU);
+
+public class Account {
+
+    private String accountNo;
+    private int balance;
+    private AccountType accountType;
+
+    public Account(String aNo, AccountType.FUTSU) {
+    }
+}
+```
+
+- static importにより列挙子やクラスメンバの記述の省略が可能
+
+```
+iimport static java.lang.System.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+       out.println("you don't need System.");
+    }
+}
+```
