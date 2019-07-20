@@ -213,6 +213,8 @@ public class Account implements Comparable<Account>{
 
 //  自然順序を宣言するためにjava.lang.Comparableインターフェースを実装
 //  引数で渡されてきたインスタンスobjと自分自身を比較
+//  これで Collections.sort(list); で要素の並び替えが可能に
+
     public int compareTo(Account obj){
 
 //      objよりも小さい場合負の数を返す
@@ -293,6 +295,62 @@ public class Main {
 
 //      浅いコピーでコピーするとh1の武器名変更がh2にまで影響する
         System.out.println("old: " + h1.getSword().getName() + " new: " + h2.getSword().getName());
+    }
+}
+```
+
+---
+### 確認問題
+
+```
+public class Book implements Comparable<Book>, Cloneable{
+
+    private String title;
+    private Date publishDate;
+    private String comment;
+
+//  HashSetに格納しても使えるようにメソッドを実装
+    public int hashCode(){
+        int r = 1;
+        r = 31 * r + publishDate.hashCode();
+        r = 31 * r + title.hashCode();
+        return r;
+    }
+
+    //  書名と発行日が同じであれば等価なものと判定
+    public boolean equals(Object o){
+        if(this ==o){
+            return true;
+        }
+        if(o == null){
+            return false;
+        }
+        if(o instanceof Book){
+            return false;
+        }
+        Book b = (Book) o;
+        if(!publishDate.equals(b.publishDate)){
+            return false;
+        }
+        if(!title.equals(b.title)){
+            return false;
+        }
+        return true;
+    }
+
+//  自然順序づけの方法を宣言
+//  発行日が古い順に並び替える
+    public int compareTo(Book o){
+        return this.publishDate.compareTo(o.publishDate);
+    }
+
+//  深いコピーによる複製で別インスタンスとして使えるようにする
+    public Book clone(){
+        Book b = new Book();
+        b.title = this.title;
+        b.comment = this.comment;
+        b.publishDate = (Date) this.publishDate.clone();
+        return b;
     }
 }
 ```
