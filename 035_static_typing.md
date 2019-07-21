@@ -189,3 +189,167 @@ public class Main {
     }
 }
 ```
+
+---
+### インナークラス
+
+- クラス宣言のブロック内にさらにクラス宣言がかける(あまり使わない)
+
+- メンバクラスはクラスブロックの中で記述するインナークラス
+
+```
+
+class Outer{
+    int outerField;
+    static int outerStaticField;
+
+    static class Inner{
+        void innerMethod(){
+//          staticな外部クラスメンバのみ利用可能
+            outerStaticField = 10;
+        }
+    }
+    void outerMethod(){
+
+//      外部クラスからInnerで利用可能
+        Inner ic = new Inner();
+    }
+}
+
+class Main{
+    public static void main(String[] args) {
+
+//      無関係なクラスからはOuter.Innerで利用
+        Outer.Inner ic = new Outer.Inner();
+    }
+}
+```
+
+- ローカルクラスはメソッドブロック内で宣言されるクラス定義
+    - ローカル変数のような特徴を持つ(他のクラスやメソッドからは利用できない)
+
+- あるメソッドの中だけで特殊なクラスを一時的に使う時に利用する(そんなケースあまりない)
+
+```
+public class Outer {
+
+    int outerMember;
+
+    void setOuterMember(){
+        int a = 10;
+
+//      Innerを定義
+        class Inner{
+            public void innerMethod(){
+                System.out.println("innnerMethod:");
+                System.out.println(outerMember);
+            }
+        }
+
+//      同じメソッド内ですぐに利用できる
+        Inner ic = new Inner();
+        ic.innerMethod();
+    }
+}
+```
+
+---
+- 匿名クラスはあるメソッド内で一回しか使わない使い捨てクラスに使用する
+
+```
+// 以下のコードは実際には動かない
+
+public class Main {
+    public static void main(String[] args) {
+
+        Pocket<Object> pocket = new Pocket<Object>();
+        System.out.println("pocket into temporary instance");
+
+//      メンバを二つ持つ匿名クラスを宣言と同時にインスタンス化
+        pocket.put(new Object() {
+            String innerField;
+
+            void innerMethod() {
+
+            }
+        });
+    }
+}
+```
+
+---
+### 確認
+
+- 金庫クラスを定義
+
+```
+// 格納するインスタンスの型は開発時には未定
+// get()する際にキャストを使わなくても格納前の型に変換できるように仮型引数にEを指定
+public class StrongBox<E> {
+
+   private E item;
+
+   public void put(E i) {
+       this.item = i;
+   }
+
+   public E get(){
+       return this.item;
+   }
+}
+
+```
+
+- 鍵の種類を示す列挙型KeyTypeを定義
+- 金庫クラスに鍵の種類を示すフィールド、種類を受け取るコンストラクタを作成
+- get()メソッドが呼び出されるたびに回数をカウントし、各鍵が定める必要施工回数に到達しない限りnullを返す
+
+```
+// 列挙型で鍵の種類を定義
+enum KeyType {
+    PADLOCK, BUTTON, DIAL, FINGER;
+}
+```
+
+```
+// これも動かない
+
+public class StrongBox<E> {
+
+    private KeyType keyType;
+    private E item;
+    private long count;
+
+    public StrongBox(KeyType key) {
+        this.keyType = key;
+    }
+
+    public void put(E i) {
+        this.item = i;
+    }
+
+    public E get() {
+
+        this.count++;
+
+        switch (this.keyType) {
+            case PADLOCK:
+                if (count < 1024) return null;
+                break;
+            case BUTTON:
+                if (count < 3000) return null;
+                break;
+            case DIAL:
+                if (count < 3000) return null;
+                break;
+            case FINGER:
+                if (count < 10000) return null;
+                break;
+        }
+
+        this.count = 0;
+        return this.item;
+    }
+}
+```
+
