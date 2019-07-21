@@ -161,3 +161,75 @@ IntoDoubleFunction func = (x) ->{
 // 単一のreturn分の場合、以下のように記載可能
 IntoDoubleFunction func = x -> x * x * 3.14;
 ```
+
+---
+- ブロック外部の変数にアクセスするラムダ式
+
+```
+import java.util.function.IntToDoubleFunction;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        double b = 1.14;
+
+        IntToDoubleFunction func = (int x) -> {
+
+            // 外部の変数の利用はできるが、ラムダ式内で書き換えはできない
+            // 変数bはfinalな変数として扱う
+            return x * x * b;
+        };
+
+        double a = func.applyAsDouble(1);
+        System.out.println(a);
+    }
+}
+```
+
+---
+### Stream
+
+- ラムダ式とコレクションを組み合わせて使う
+
+```
+// ラムダを使わずに書く
+
+// List<Integer> list1 の各要素の2倍を表示
+for(Integer i : list1) {
+    System.out.println(i * 2);
+}
+
+// List<Character> list2 の各要素に対してsleep()を呼び出す
+for(Character c : list) {
+    c.sleep();
+}
+
+```
+
+```
+// ラムダを使って書く
+// forEachメソッドを呼び出す際に、ラムダ式で生み出した関数を渡している
+
+list1.stream().forEach(i -> System.out.println(i * 2));
+
+list2.stream().forEach(c -> c.sleep());
+```
+
+- 配列に対してStream処理を行う
+
+```
+int[] data = {1, 2, 3};
+Stream st = Arrays.stream(data);
+
+```
+
+- Streamで書くと並列化により処理が高速になる
+
+```
+// List<Integer> list1 の各要素の2倍を高速で表示する
+// JVMが並列処理を行う(マルチコアCPUの環境なら処理速度が早くなる)
+
+list1.parallelStream().forEach(i -> System.out.println(i * 2));
+```
+
