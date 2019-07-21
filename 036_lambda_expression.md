@@ -233,3 +233,79 @@ Stream st = Arrays.stream(data);
 list1.parallelStream().forEach(i -> System.out.println(i * 2));
 ```
 
+---
+### 確認
+
+```
+public class FuncList {
+
+    public static boolean isOdd(int x) {
+        return (x % 2 == 1);
+    }
+
+    public String addNamePrefix(boolean male, String name) {
+        if (male == true) {
+            return "Mr. " + name;
+        } else {
+            return "Ms. " + name;
+        }
+    }
+}
+```
+
+```
+
+public class Main {
+
+    interface Func1 {
+        boolean call(int x);
+    }
+
+    interface Func2 {
+        String call(boolean male, String name);
+    }
+
+    public static void main(String[] args) {
+
+        FuncList funcList = new FuncList();
+
+        Func1 f1 = FuncList::isOdd;
+
+        // staticが付いていないので直接参照はできない(funcListに格納)
+        Func2 f2 = funcList::addNamePrefix;
+
+        System.out.println(f1.call(15));
+        System.out.println(f2.call(true, "Mike"));
+    }
+}
+```
+
+```
+// ラムダ式で記述
+
+public class Main {
+
+    interface Func1 {
+        boolean call(int x);
+    }
+
+    interface Func2 {
+        String call(boolean male, String name);
+    }
+
+    public static void main(String[] args) {
+
+        Func1 f1 = x -> x % 2 == 1;
+        Func2 f2 = (male, name) -> {
+            if (male == true) {
+                return "Mr." + name;
+            } else {
+                return "Ms." + name;
+            }
+        };
+
+        System.out.println(f1.call(15));
+        System.out.println(f2.call(true, "Mike"));
+    }
+}
+```
