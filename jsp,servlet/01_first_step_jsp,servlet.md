@@ -7,7 +7,7 @@
 - サーブレットはサーブレットクラス,JSPはJSPクラスというブラウザから実行できる特別なクラスを使用
     - JSPファイルは実行時にサーブレットクラスに変換される
 
-- プログラムを動かす機能を持つサーバをアプリケーションサーバと呼ぶ
+- プログラムを動かす機能を持つサーバを「アプリケーションサーバ」と呼ぶ
     - アプリケーションサーバ内のサーブレットクラスを実行する機能をサーブレットコンテナ
 
 - サーブレットクラスはブラウザからのリクエストによって実行され、結果をHTMLで出力する
@@ -55,6 +55,7 @@ public class SampleServlet extends HttpServlet {
 //  実行されるメソッド(メインメソッドのようなもの)
 //  引数にブラウザからのリクエストが入り、その詳細情報を取り出して処理したものを
 //  HttpServletResponseインスタンスを用いてブラウザに送り返す
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
