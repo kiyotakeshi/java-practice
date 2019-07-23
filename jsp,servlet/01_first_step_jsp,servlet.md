@@ -132,3 +132,118 @@ fortune
 2019/07/23 fortune is .. bad
 
 ```
+
+---
+### JSP
+
+- リクエストされるとJSPファイルをサーブレットクラスに変換
+
+1. JSPファイルをコーディング
+2. サーブレットクラスのソースファイルに変換
+3. サーブレットクラスのクラスファイルにコンパイル
+4. サーブレットクラスのインスタンス化
+
+- HTMLの中にJAVAのコードを埋め込むことが可能
+    - HTML部分をテンプレート,Javaのコード部分をスクリプト
+    - スクリプトは、スクリプトレット、スクリプト式、スクリプト宣言からなる
+
+- スクリプトレット
+
+```
+<% int x = 20 %>
+```
+
+- スリクプト式
+    - 変数や戻り値を出力可能
+
+```
+<%= %>
+```
+
+---
+- JSPを使ってみる
+
+```
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+
+<%@ page import="java.util.Date,java.text.SimpleDateFormat"%>
+<%
+	// 運勢のリスト
+	String[] luckArray = { "super_sukkiri", "sukkiri", "bad" };
+
+	int index = (int) (Math.random() * 3);
+	String luck = luckArray[index];
+
+	Date date = new Date();
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+	String today = sdf.format(date);
+%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>fortune</title>
+</head>
+<body>
+<p><%= today %>'s fortune is ... <%= luck %></p>
+</body>
+</html>
+```
+
+---
+### 確認
+
+```
+// Employee.java
+
+package lesson;
+
+public class Employee {
+	private String id;
+	private String name;
+
+	public Employee(String id, String name) {
+		this.id = id;
+		this.name = name;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public String getName() {
+		return name;
+	}
+}
+```
+
+```
+// lesson.jsp
+
+<%@ page contentType="text/html;charset=UTF-8" import="lesson.Employee"%>
+<%
+	Employee emp = new Employee("002", "Mike");
+%>
+
+<!DOCTYPE html>
+<html>
+<body>
+	<p> ID:<%=emp.getId()%>,Name is <%=emp.getName()%> </p>
+</body>
+</html>
+```
+
+- 実行結果
+```
+http://localhost:8080/lesson/lesson.jsp
+ ID:002,Name is Mike
+
+kiyota-MacBook-Pro:WebContent kiyotatakeshi$ curl http://localhost:8080/lesson/lesson.jsp
+<!DOCTYPE html>
+<html>
+<body>
+	<p> ID:002,Name is Mike </p>
+</body>
+</html>
+```
