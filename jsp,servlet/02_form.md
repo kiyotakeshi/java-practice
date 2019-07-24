@@ -75,6 +75,7 @@ public class Hoge extends HttpServlet {
 ### 簡単なユーザ登録(DBは使わない)
 
 - 名前と性別の両方を入力していれば成功
+	- jspファイルを実行する
 
 ```
 // formSample.jsp
@@ -166,4 +167,51 @@ public class FormSampleServlet extends HttpServlet {
 		out.println("</html>");
 	}
 }
+```
+
+---
+- hiddenパラメータ
+	- 利用者が何もしてしなくてもリクエストパラメータを付加してサーバに送信する仕組み
+
+- フォームの入力に要した時間を計測
+
+```
+// リンクで送るパターン
+<a href="/SampleServlet?epoc=<%= System.currentTimeMills() %>">リンク＜/a>
+
+// フォームで送るパターン
+<form action="/SampleServlet?epoc=<%= System.currentTimeMills() %>" method="post">
+<input type="submit" value="送信">
+</form>
+```
+
+---
+### 練習
+
+- サーブレットクラスとの連動はしていない
+
+```
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Customer form</title>
+</head>
+<body>
+<form action="/example/testenq"  method="post">
+Name:<input type="text" name="name"><br>
+Query type:
+<select name="qtype">
+<option value="company">About compamy</option>
+<option value="product"> product</option>
+<option value="support">after support</option>
+</select><br>
+Query content:
+<textarea name="body"></textarea><br>
+<input type="submit">
+</form>
+</body>
+</html>
 ```
