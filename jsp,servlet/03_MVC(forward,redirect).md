@@ -118,3 +118,42 @@ public class RedirectServlet extends HttpServlet {
 
 ---
 ### 確認
+
+- アクセス時の乱数に応じてリダイレクトかフォワードする
+
+```
+http://localhost:8080/ex50/redirected.jsp
+http://localhost:8080/ex50/Ex50servlet
+```
+
+
+```
+package servlet;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/Ex50servlet")
+public class Ex50servlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		int rand = (int) (Math.random() * 10);
+
+		if (rand % 2 == 1) {
+			response.sendRedirect("/ex50/redirected.jsp");
+		} else {
+			RequestDispatcher d = request.getRequestDispatcher("/forwarded.jsp");
+			d.forward(request, response);
+		}
+	}
+}
+```
