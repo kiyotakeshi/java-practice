@@ -186,10 +186,19 @@ Password:<input type="password" name="pass"><br>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Tsubuyaki</title>
 </head>
-<body>
 
+<body>
+<h1>Tsubuyaki Login</h1>
+<% if(loginUser != null){ %>
+	<p>Login sucess!</p>
+	<p>Welcome <%= loginUser.getName() %></p>
+	<a href="/Tsubuyaki/Main">Let's Tsubuyaki</a>
+<% } else { %>
+	<p>Login failed...</p>
+	<a href="/Tsubuyaki/">go to Top...</a>
+<% } %>
 </body>
 </html>
 ```
@@ -250,6 +259,7 @@ public class Login extends HttpServlet {
 ```
 
 - index.jspにアクセスするとログイン画面がでてくる
+- passが1234の時にログインに成功
 
 ---
-### 
+###
