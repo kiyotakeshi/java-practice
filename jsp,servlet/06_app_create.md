@@ -4,6 +4,8 @@
     - ログイン、ログアウト、ツイート、ツイート閲覧
 
 ---
+### はじめにつくる
+
 - 単純に情報を保持するだけのJavaBeansクラスを作成
 
 ```
@@ -44,7 +46,8 @@ public class Mutter implements Serializable {
 	private String text;
 
 	public Mutter() {}
-	public Mutter() {String userName, String text){
+
+	public Mutter(String userName, String text){
 		this.userName = userName;
 		this.text = text;
 	}
@@ -56,3 +59,25 @@ public class Mutter implements Serializable {
 
 ---
 - トップ画面の作成
+
+```
+// index.jsp
+// ブラウザから直接リクエストするため、WebContext直下に配置
+// デフォルトページのためファイル名を省略してもアクセス可能
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Tsubuyaki</title>
+</head>
+<body>
+<h1>Welcome to Tubuyaki</h1>
+</body>
+</html>
+```
+
+---
+### ログイン機能を作成
