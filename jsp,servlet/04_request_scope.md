@@ -253,7 +253,7 @@ BodyType:<%= health.getBodyType() %>
 
 - GETリクエストによりFruitインスタンスを生成して画面に表示する
 	- リクエストスコープを使用
-	
+
 ```
 package lesson;
 
