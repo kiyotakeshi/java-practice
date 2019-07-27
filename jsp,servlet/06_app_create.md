@@ -81,3 +81,175 @@ public class Mutter implements Serializable {
 
 ---
 ### ログイン機能を作成
+
+```
+// User.java(修正)
+
+package servlet;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import model.LoginLogic;
+import model.User;
+
+@WebServlet("/Login")
+public class Login extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		// リクエストパラメータの取得
+		request.setCharacterEncoding("UTF-8");
+		String name = request.getParameter("name");
+		String pass = request.getParameter("pass");
+
+		// Userインスタンス(ユーザ情報)の生成
+		User user = new User(name, pass);
+
+		// ログイン処理
+		LoginLogic loginLogic = new LoginLogic();
+		boolean isLogin = loginLogic.execute(user);
+
+		// ログイン成功時の処理
+		if(isLogin) {
+			// ユーザ情報をセッションスコープに保存
+			HttpSession session = request.getSession();
+			session.setAttribute("loginUser", user);
+		}
+
+		// ログイン結果画面にフォワード
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/loginResult.jsp");
+		dispatcher.forward(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+
+}
+```
+
+```
+// LoginLogic.java
+
+package model;
+
+public class LoginLogic {
+	public boolean execute(User user) {
+		if(user.getPass().equals("1234")) { return true;}
+		return false;
+	}
+}
+```
+
+```
+// index.jsp(修正)
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Tsubuyaki</title>
+</head>
+<body>
+<h1>Welcome to Tubuyaki</h1>
+<form action="/Tsubuyaki/Login" method="post">
+UserName:<input type="text" name="name"><br>
+Password:<input type="password" name="pass"><br>
+<input type="submit" value="Login">
+</form>
+</body>
+</html>
+```
+
+```
+// loginResult.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+  <%@ page import="model.User" %>
+  <%
+  //　セッションスコープからユーザ情報を取得
+  User loginUser = (User) session.getAttribute("loginUser");
+  %>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+</body>
+</html>
+```
+
+```
+// Login.java
+// ログインに関するリクエストを処理するコントローラ
+
+package servlet;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import model.LoginLogic;
+import model.User;
+
+@WebServlet("/Login")
+public class Login extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		// リクエストパラメータの取得
+		request.setCharacterEncoding("UTF-8");
+		String name = request.getParameter("name");
+		String pass = request.getParameter("pass");
+
+		// Userインスタンス(ユーザ情報)の生成
+		User user = new User(name, pass);
+
+		// ログイン処理
+		LoginLogic loginLogic = new LoginLogic();
+		boolean isLogin = loginLogic.execute(user);
+
+		// ログイン成功時の処理
+		if(isLogin) {
+			// ユーザ情報をセッションスコープに保存
+			HttpSession session = request.getSession();
+			session.setAttribute("loginUser", user);
+		}
+
+		// ログイン結果画面にフォワード
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/loginResult.jsp");
+		dispatcher.forward(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+
+}
+```
+
+- index.jspにアクセスするとログイン画面がでてくる
+
+---
+### 
