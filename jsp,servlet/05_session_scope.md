@@ -316,3 +316,136 @@ public class RegisterUser extends HttpServlet {
 - リクエストをまたいでユーザの情報を保持する通信を**ステートフル**な通信と呼ぶ
 - リクエストをまたいで情報を保持できない通信を**ステートレス**な通信と呼ぶ
     - HTTPはステートレスなためセッションスコープやクッキーなどでステートフルを実現する
+
+---
+### 確認
+
+- リクエストがあるとインスタンスを作成し、セッションスコープを使いJSPに受け渡す
+
+```
+// FrutInstance.java
+
+package lesson;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+@WebServlet("/FrutInstance")
+public class FrutInstance extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Fruit f = new Fruit("apple",200);
+
+		// リクエストスコープを使用
+//		request.setAttribute("fruit", f);
+
+		// セッションスコープを使用
+		HttpSession session = request.getSession();
+		session.setAttribute("fruit",f);
+
+		RequestDispatcher d = request.getRequestDispatcher("/show.jsp");
+		d.forward(request, response);
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
+package lesson;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+@WebServlet("/FrutInstance")
+public class FrutInstance extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Fruit f = new Fruit("apple",200);
+
+		// リクエストスコープを使用
+//		request.setAttribute("fruit", f);
+
+		// セッションスコープを使用
+		HttpSession session = request.getSession();
+		session.setAttribute("fruit",f);
+
+		RequestDispatcher d = request.getRequestDispatcher("/show.jsp");
+		d.forward(request, response);
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+}
+
+```
+
+```
+// Fruit.java
+
+package lesson;
+
+public class Fruit implements java.io.Serializable {
+
+	private String name;
+	private int price;
+
+	public Fruit() {}
+
+	public Fruit(String name, int price) {
+		this.name = name;
+		this.price = price;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public int getPrice() {
+		return price;
+	}
+}
+```
+
+```
+// show.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" %>
+<%@ page import="lesson.Fruit" %>
+ <% Fruit fruit = (Fruit) session.getAttribute("fruit");  %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>fruit price</title>
+</head>
+<body>
+<p><%= fruit.getName() %> price is <%= fruit.getPrice() %> yen.</p>
+</body>
+</html>
+```
