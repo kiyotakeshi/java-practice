@@ -349,3 +349,85 @@ public class Main extends HttpServlet {
 	}
 }
 ```
+
+---
+### ログアウト機能
+
+```
+// Logout.java
+// ログアウトに関するリクエストを処理するコントローラー
+
+package servlet;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+@WebServlet("/Logout")
+public class Logout extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		// セッションスコープを破棄
+		HttpSession session = request.getSession();
+		session.invalidate();
+
+		// ログアウト画面にフォワード
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/logout.jsp");
+		dispatcher.forward(request, response);
+	}
+}
+```
+
+```
+// main.jsp(修正)
+// ログアウト処理を追加
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+ <%@ page import="model.User" %>
+ <%
+// セッションスコープに保存されたユーザ情報を取得
+User loginUser = (User) session.getAttribute("loginUser");
+ %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Tsubuyaki</title>
+</head>
+<body>
+<h1>Tsubuyaki Main</h1>
+<p>
+<%= loginUser.getName() %> is login-user
+<a href="/Tsubuyaki/Logout">Logout</a>
+</p>
+</body>
+</html>
+```
+
+```
+// logout.jsp
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Tsubuyaki</title>
+</head>
+<body>
+<h1>Tsubuyaki logout</h1>
+<p>Logout!!</p>
+<a href="/Tsubuyaki/">go to Top page...</a>
+</body>
+</html>
+```
