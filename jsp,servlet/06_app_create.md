@@ -262,4 +262,90 @@ public class Login extends HttpServlet {
 - passが1234の時にログインに成功
 
 ---
-###
+### メイン画面の作成
+
+```
+// main.jsp
+// メイン画面を出力するビュー
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+ <%@ page import="model.User" %>
+ <%
+// セッションスコープに保存されたユーザ情報を取得
+User loginUser = (User) session.getAttribute("loginUser");
+ %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Tsubuyaki</title>
+</head>
+<body>
+<h1>Tsubuyaki Main</h1>
+<p>
+<%= loginUser.getName() %> is login-user
+</p>
+</body>
+</html>
+```
+
+```
+// Main.java
+// ツイートに関するリクエストを処理するコントローラー
+// セッションスコープ内のUserインスタンスの取得を試みてログイン状況を確認
+// アプリケーションスコープ内のツイートリストを確認してなければ空のリストを作成
+
+package servlet;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import model.Mutter;
+import model.User;
+/**
+ * Servlet implementation class Main
+ */
+@WebServlet("/Main")
+public class Main extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		// ツイートリストをアプリケーションスコープから取得
+		ServletContext application = this.getServletContext();
+		List <Mutter> mutterList = (List<Mutter>) application.getAttribute("mutterList");
+
+		// 取得できなかった際にはツイートリストを新規作成し、アプリケーションスコープに保存
+		if(mutterList == null) {
+			mutterList = new ArrayList<Mutter>();
+			application.setAttribute("mutterList", mutterList);
+		}
+
+		// ログインしているか確認するためセッションスコープからユーザ情報を取得
+		HttpSession session = request.getSession();
+		User loginUser = (User) session.getAttribute("loginUser");
+
+		if(loginUser == null) {
+
+			// ログインしていない場合リダイレクト(index.jsp)
+			response.sendRedirect("/Tsubuyaki/");
+		} else {
+
+			// ログインしている場合はフォワード
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/main.jsp");
+			dispatcher.forward(request, response);
+		}
+	}
+}
+```
