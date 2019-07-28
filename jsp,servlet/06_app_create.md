@@ -431,3 +431,154 @@ User loginUser = (User) session.getAttribute("loginUser");
 </body>
 </html>
 ```
+
+---
+### 投稿の閲覧機能
+
+```
+// PostMutterLogic.java
+// ツイートの投稿に関する処理を行うモデル
+
+package model;
+
+import java.util.List;
+
+public class PostMutterLogic {
+
+	// 0番の位置にmutterListを格納
+	// 指定した位置(0番)にインスタンが格納されている場合は以前のものを後ろにずらす
+	public void execute(Mutter mutter, List<Mutter> mutterList) {
+		mutterList.add(0, mutter);
+	}
+}
+```
+
+```
+// Main.java(修正)
+// ツイートに関するリクエストを処理するコントローラー(POSTとして呼び出された場合)
+// GETで呼ばれた場合は単にメイン画面を表示する
+
+package servlet;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import model.Mutter;
+import model.PostMutterLogic;
+import model.User;
+/**
+ * Servlet implementation class Main
+ */
+@WebServlet("/Main")
+public class Main extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		// ツイートリストをアプリケーションスコープから取得
+		ServletContext application = this.getServletContext();
+		List <Mutter> mutterList = (List<Mutter>) application.getAttribute("mutterList");
+
+		// 取得できなかった際にはツイートリストを新規作成し、アプリケーションスコープに保存
+		if(mutterList == null) {
+			mutterList = new ArrayList<Mutter>();
+			application.setAttribute("mutterList", mutterList);
+		}
+
+		// ログインしているか確認するためセッションスコープからユーザ情報を取得
+		HttpSession session = request.getSession();
+		User loginUser = (User) session.getAttribute("loginUser");
+
+		if(loginUser == null) {
+
+			// ログインしていない場合リダイレクト(index.jsp)
+			response.sendRedirect("/Tsubuyaki/");
+		} else {
+
+			// ログインしている場合はフォワード
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/main.jsp");
+			dispatcher.forward(request, response);
+		}
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		// リクエストパラメータの取得
+		request.setCharacterEncoding("UTF-8");
+		String text = request.getParameter("text");
+
+		// 入力値のチェック
+		if(text != null && text.length() != 0) {
+
+			// アプリケーションスコープに保存されたツイートリストを取得
+			ServletContext application = this.getServletContext();
+			List<Mutter> mutterList = (List<Mutter>) application.getAttribute("mutterList");
+
+			// セッションスコープに保存されたユーザ情報を取得
+			HttpSession session = request.getSession();
+			User loginUser = (User) session.getAttribute("loginUser");
+
+			// ツイートをツイートリストに追加
+			Mutter mutter = new Mutter(loginUser.getName(), text);
+			PostMutterLogic postMutterLogic = new PostMutterLogic();
+			postMutterLogic.execute(mutter, mutterList);
+
+			// アプリケーションスコープにツイートリストを保存
+			application.setAttribute("mutterList", mutterList);
+
+			// メイン画面にフォワード
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/main.jsp");
+			dispatcher.forward(request, response);
+		}
+	}
+}
+```
+
+```
+// main.jsp(修正)
+// メイン画面を出力するビュー
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+ <%@ page import="model.User,model.Mutter,java.util.List" %>
+ <%
+
+// セッションスコープに保存されたユーザ情報を取得
+User loginUser = (User) session.getAttribute("loginUser");
+
+ // アプリケーションスコープに保存されたツイートリストを取得
+ List<Mutter> mutterList = (List<Mutter>) application.getAttribute("mutterList");
+ %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Tsubuyaki</title>
+</head>
+<body>
+<h1>Tsubuyaki Main</h1>
+<p>
+<%= loginUser.getName() %> is login-user
+<a href="/Tsubuyaki/Logout">Logout</a>
+</p>
+<p><a href="/Tsubuyaki/Main">Renew</a></p>
+<form action="/Tsubuyaki/Main" method="post">
+<input type="text" name="text">
+<input type="submit" value="tweet">
+</form>
+<% for(Mutter mutter : mutterList) { %>
+	<p><%= mutter.getUserName() %>:<%= mutter.getText() %></p>
+<% } %>
+</body>
+</html>
+```
