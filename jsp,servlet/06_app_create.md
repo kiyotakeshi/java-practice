@@ -670,14 +670,16 @@ public class Main extends HttpServlet {
 			// アプリケーションスコープにツイートリストを保存
 			application.setAttribute("mutterList", mutterList);
 
-			// メイン画面にフォワード
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/main.jsp");
-			dispatcher.forward(request, response);
 		} else {
 
 			// エラーメッセージをリクエストスコープに保存
 			request.setAttribute("errorMsg", "Any messeges please");
 		}
+
+			// メイン画面にフォワード
+			// ツイート内容のエラーの有無に関係なく必要な処理
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/main.jsp");
+			dispatcher.forward(request, response);
 	}
 }
 ```
@@ -686,5 +688,45 @@ public class Main extends HttpServlet {
 // main.jsp
 // エラーメッセージの取得と表示に関する部分を追加
 
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+ <%@ page import="model.User,model.Mutter,java.util.List" %>
+ <%
 
+// セッションスコープに保存されたユーザ情報を取得
+User loginUser = (User) session.getAttribute("loginUser");
+
+ // アプリケーションスコープに保存されたツイートリストを取得
+ List<Mutter> mutterList = (List<Mutter>) application.getAttribute("mutterList");
+
+ // リクエストスコープに保存されたエラーメッセージを取得
+ String errorMsg = (String) request.getAttribute("errorMsg");
+ %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Tsubuyaki</title>
+</head>
+<body>
+<h1>Tsubuyaki Main</h1>
+<p>
+<%= loginUser.getName() %> is login-user
+<a href="/Tsubuyaki/Logout">Logout</a>
+</p>
+<p><a href="/Tsubuyaki/Main">Renew</a></p>
+<form action="/Tsubuyaki/Main" method="post">
+<input type="text" name="text">
+<input type="submit" value="tweet">
+</form>
+<% if(errorMsg != null) { %>
+<p><%= errorMsg %></p>
+<% } %>
+
+<% for(Mutter mutter : mutterList) { %>
+	<p><%= mutter.getUserName() %>:<%= mutter.getText() %></p>
+<% } %>
+
+</body>
+</html>
 ```
