@@ -243,3 +243,157 @@ User loginUser = (User) session.getAttribute("loginUser");
 
 ---
 ### DBの使用
+
+- Javaプログラムからデータベースを利用するに必要なもの
+    - java.sqlパッケージのクラス
+    - JDBCドライバと呼ばれるライブラリ
+        - DB操作に必要なクラスやインターフェース群
+        - DB開発元がJARファイルとして提供
+
+- JARファイルはクラスやインターフェースをまとめて格納したファイル
+    - クラスパスに追加やWEB-INF/lib以下に追加することでビルドパスに追加され利用可能に
+
+```
+kiyota-MacBook-Pro:lib kiyotatakeshi$ pwd
+/Applications/Eclipse_2019-06.app/Contents/workspace/example/WebContent/WEB-INF/lib
+kiyota-MacBook-Pro:lib kiyotatakeshi$ ls -l
+total 5064
+-rwxr-xr-x@ 1 kiyotatakeshi  admin  2166760  7 30 21:48 h2-1.4.199.jar
+-rwxr-xr-x@ 1 kiyotatakeshi  admin    30527  7 30 23:22 jstl-api-1.2.jar
+-rwxr-xr-x@ 1 kiyotatakeshi  admin   391957  7 30 23:22 jstl-impl-1.2.jar
+```
+
+- DBを利用するクラスは必ずDAO(Data Access Object)を利用する
+    - DB操作(検索、更新、削除)を担当するクラス
+    - JDBC特有のコードの修正が様々なところに混在しないため
+
+- DAOクラスはテーブルごとに作成し、テーブル名+DAOとするのが一般的
+
+---
+- EMPLOYEEテーブルから全レコードを取得する
+
+```
+// EMPLOYEEテーブルの1件分のデータを格納するクラス
+package model;
+
+public class Employee {
+
+	private String id;
+	private String name;
+	private int age;
+
+	public Employee(String id, String name, int age) {
+		this.id = id;
+		this.name = name;
+		this.age = age;
+	}
+	public String getId() { return id;}
+	public String getName() { return name;}
+	public int getAge() { return age;}
+}
+
+```
+
+```
+// package dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import model.Employee;
+
+public class EmployeeDAO {
+	public List<Employee>  findAll(){
+
+		Connection conn = null;
+		List<Employee> empList = new ArrayList<Employee>();
+
+		try {
+			// JDBCドライバを読み込む
+			Class.forName("org.h2.Driver");
+
+			// DBへ接続
+			// 接続先DB,ユーザ名、パスワード
+			conn = DriverManager.getConnection("jdbc:h2:~/test/SAMPLE", "root", "Zaq12wsx");
+
+			// SELECT文を準備
+			String sql = "SELECT ID, NAME, AGE FROM EMPLOYEE";
+			PreparedStatement pStmt = conn.prepareStatement(sql);
+
+			// SELECTを実行し、結果を取得
+			ResultSet rs = pStmt.executeQuery();
+
+			// 結果表に格納されたレコードの内容を
+			// Employeeインスタンスに設定し、ArrayListインスタンスに追加
+				while(rs.next()) {
+					String id = rs.getString("ID");
+					String name = rs.getString("NAME");
+					int age = rs.getInt("AGE");
+					Employee employee = new Employee(id,name,age);
+					empList.add(employee);
+				}
+		} catch(SQLException e) {
+			e.printStackTrace();
+			return null;
+
+		} catch(ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+
+		} finally {
+			// DB切断
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch(SQLException e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+		}
+		return empList;
+	}
+}
+
+```
+
+```
+// SelectEmployeeSample.java
+// JDBC特有のコードを書く必要がない
+
+package model;
+
+import java.util.List;
+
+import dao.EmployeeDAO;
+
+public class SelectEmployeeSample {
+	public static void main(String[] args) {
+
+		// employeeテーブルの全レコードを取得
+		EmployeeDAO empDAO = new EmployeeDAO();
+		List <Employee> empList = empDAO.findAll();
+
+		// 取得したレコードの内容を出力
+		for(Employee emp: empList) {
+			System.out.println("ID:" + emp.getId());
+			System.out.println("Name:" + emp.getName());
+			System.out.println("Age:" + emp.getAge() + "\n");
+		}
+	}
+}
+```
+
+-
+
+---
+
+- MVCモデルではアプリケーションが扱う情報の管理はModelの役割
+- ModelのクラスからDAOを利用するのが一般的
+
+-
