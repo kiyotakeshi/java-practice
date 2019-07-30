@@ -730,3 +730,66 @@ User loginUser = (User) session.getAttribute("loginUser");
 </body>
 </html>
 ```
+
+---
+### ツイートの保存先をデータベースに変更する
+
+- アプリケーションスコープからDBに変更
+	- サーバの停止や再開をしてもデータが残る
+
+- JDBCドライバを配置
+
+```
+kiyota-MacBook-Pro:lib kiyotatakeshi$ pwd
+/Applications/Eclipse_2019-06.app/Contents/workspace/Tsubuyaki/WebContent/lib
+kiyota-MacBook-Pro:lib kiyotatakeshi$ ls -l
+total 5064
+-rwxr-xr-x  1 kiyotatakeshi  admin  2166760  7 30 21:48 h2-1.4.199.jar
+-rwxr-xr-x  1 kiyotatakeshi  admin    30527  7 30 23:22 jstl-api-1.2.jar
+-rwxr-xr-x  1 kiyotatakeshi  admin   391957  7 30 23:22 jstl-impl-1.2.jar
+```
+
+- DBの操作の練習
+
+```
+CREATE TABLE EMPLOYEE (
+  ID CHAR(6) PRIMARY KEY,
+  NAME VARCHAR(100) NOT NULL,
+  AGE INT NOT NULL
+);
+
+INSERT INTO EMPLOYEE (ID, NAME, AGE)
+  VALUES('EMP001', 'MIKE', 23);
+INSERT INTO EMPLOYEE(ID, NAME, AGE)
+  VALUES('EMP002', 'TOM', 22);
+
+CREATE TABLE EMPLOYEE (
+  ID CHAR(6) PRIMARY KEY, NAME VARCHAR(100) NOT NULL,
+   AGE INT NOT NULL
+);
+```
+
+- 今回使用するDBの準備
+```
+// データベース Tsubuyaki を作成
+
+// テーブル MUTTER を作成
+
+CREATE TABLE MUTTER(
+	ID INT PRIMARY KEY AUTO_INCREMENT,
+	NAME VARCHAR(100) NOT NULL,
+	TEXT VARCHAR(255) NOT NULL,
+);
+
+// MUTTERテーブルにレコードを追加
+INSERT INTO MUTTER (NAME, TEXT) VALUES ('MIKE', 'TODAY IS HOLIDAY');
+INSERT INTO MUTTER (NAME, TEXT) VALUES ('TOM', 'GOOD');
+
+// 確認
+select * from mutter;
+ID  	NAME  	TEXT
+1	MIKE	TODAY IS HOLIDAY
+2	TOM	GOOD
+(2 行, 5 ms)
+```
+
