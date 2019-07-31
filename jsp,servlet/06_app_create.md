@@ -769,6 +769,7 @@ CREATE TABLE EMPLOYEE (
 );
 ```
 
+---
 - 今回使用するDBの準備
 ```
 // データベース Tsubuyaki を作成
@@ -793,3 +794,265 @@ ID  	NAME  	TEXT
 (2 行, 5 ms)
 ```
 
+---
+- Javaコードの変更、新規作成
+
+```
+// Mutter.java
+// MUTTERテーブルのレコードを表すように変更
+
+package model;
+
+import java.io.Serializable;
+
+public class Mutter implements Serializable {
+
+//	MUTTERテーブルのレコードに対応させるためidを追加
+	private int id;
+	private String userName;
+	private String text;
+
+	public Mutter() {}
+
+	public Mutter(int id, String userName, String text){
+		this.id = id;
+		this.userName = userName;
+		this.text = text;
+	}
+
+	public int getId() { return id;}
+	public String getUserName() {return userName;}
+	public String getText() { return text;}
+}
+```
+
+```
+// Main.java
+// ツイートの取得と追加の処理を変更
+
+package servlet;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import model.GetMutterListLogic;
+import model.Mutter;
+import model.PostMutterLogic;
+import model.User;
+/**
+ * Servlet implementation class Main
+ */
+@WebServlet("/Main")
+public class Main extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		// ツイートリストを取得して、リクエストスコープに保存
+		GetMutterListLogic getMutterListLogic = new GetMutterListLogic();
+		List<Mutter> mutterList = getMutterListLogic.execute();
+		request.setAttribute("mutterList", mutterList);
+
+		// ログインしているか確認するためセッションスコープからユーザ情報を取得
+		HttpSession session = request.getSession();
+		User loginUser = (User) session.getAttribute("loginUser");
+
+		if(loginUser == null) {
+
+			// ログインしていない場合リダイレクト(index.jsp)
+			response.sendRedirect("/Tsubuyaki/");
+		} else {
+
+			// ログインしている場合はフォワード
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/main.jsp");
+			dispatcher.forward(request, response);
+		}
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		// リクエストパラメータの取得
+		request.setCharacterEncoding("UTF-8");
+		String text = request.getParameter("text");
+
+		// 入力値のチェック
+		if(text != null && text.length() != 0) {
+
+			// セッションスコープに保存されたユーザ情報を取得
+			HttpSession session = request.getSession();
+			User loginUser = (User) session.getAttribute("loginUser");
+
+			// ツイートをツイートリストに追加
+			Mutter mutter = new Mutter(loginUser.getName(), text);
+			PostMutterLogic postMutterLogic = new PostMutterLogic();
+			postMutterLogic.execute(mutter);
+
+		} else {
+
+			// エラーメッセージをリクエストスコープに保存
+			request.setAttribute("errorMsg", "Any messeges please");
+		}
+
+		// ツイートリストを取得してリクエストスコープに保存
+		GetMutterListLogic getMutterListLogic = new GetMutterListLogic();
+		List<Mutter> mutterList = getMutterListLogic.execute();
+		request.setAttribute("mutterList", mutterList);
+
+		// メイン画面にフォワード
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/main.jsp");
+		dispatcher.forward(request, response);
+	}
+}
+```
+
+```
+// PostMutterLogic.java
+// ツイートの保存の処理を変更
+
+package model;
+
+import dao.MutterDAO;
+
+public class PostMutterLogic {
+
+	// 引数のMutterインスタンスをMutterテーブルに追加
+	public void execute(Mutter mutter) {
+		MutterDAO dao = new MutterDAO();
+		dao.create(mutter);
+	}
+}
+```
+
+```
+// GetMutterListLogic.java
+// 新規作成、全ツイートをデータベースから取得
+
+package model;
+
+import java.util.List;
+
+import dao.MutterDAO;
+
+public class GetMutterListLogic {
+	public List<Mutter> execute(){
+		MutterDAO dao = new MutterDAO();
+		List<Mutter> mutterList = dao.findAll();
+		return mutterList;
+	}
+}
+```
+
+```
+// MutterDAO.java
+// 新規作成、MUTTERテーブルの利用を担当するDAO
+// 全レコードを取得するメソッドとレコードの追加を行うメソッドを持つ
+
+package dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import model.Mutter;
+
+public class MutterDAO {
+
+	private final String DRIVER_NAME = "org.h2.Driver";
+	private final String JDBC_URL = "jbdc:h2:~/Tsubuyaki";
+	private final String DB_USER = "ROOT";
+	private final String DB_PASS = "Zaq12wsx";
+
+	// 全レコードを取得するメソッド
+	public List<Mutter> findAll(){
+		Connection conn = null;
+		List<Mutter> mutterList = new ArrayList<Mutter>();
+
+		try {
+			Class.forName(DRIVER_NAME);
+			conn = DriverManager.getConnection(JDBC_URL,DB_USER,DB_PASS);
+
+			// SELECT文の準備
+			// ORDER BY ID DESCでIDが大きい順に並び替える(投稿が新しい順になる)
+			String sql = "SELECT ID,NAME,TEXT FROM MUTTER ORDER BY ID DESC";
+			PreparedStatement pStmt = conn.prepareStatement(sql);
+
+			// SELECT文を実行
+			ResultSet rs = pStmt.executeQuery();
+
+			// SELECT文の結果をArrayListに格納
+			while(rs.next()) {
+				int id = rs.getInt("ID");
+				String userName = rs.getString("NAME");
+				String text = rs.getString("TEXT");
+				Mutter mutter = new Mutter(id, userName, text);
+				mutterList.add(mutter);
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+			return null;
+		} catch(ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			// DB切断
+			if(conn != null) {
+				try {
+					conn.close();
+				} catch(SQLException e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+		}
+		return mutterList;
+	}
+
+	// レコードを追加するメソッド
+	public boolean create(Mutter mutter) {
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection(JDBC_URL,DB_USER,DB_PASS);
+
+			// INSERT文の準備(idは自動連番)
+			String sql = "INSERT INTO MUTTER(NAME, TEXT) VALUES(?, ?)";
+			PreparedStatement pStmt = conn.prepareStatement(sql);
+
+			// INSERT文の?に使用する値を設定
+			pStmt.setString(1, mutter.getUserName());
+			pStmt.setString(2, mutter.getText());
+
+			// INSERT文の実行
+			int result = pStmt.executeUpdate();
+
+			if(result != 1) {
+				return false;
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			// DB切断
+			if(conn != null) {
+				try {
+					conn.close();
+				} catch(SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return true;
+	}
+}
+```
