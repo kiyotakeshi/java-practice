@@ -1,4 +1,4 @@
-- Requre
+- require
 
 ```
 /WEB-INF/lib
