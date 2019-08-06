@@ -1,0 +1,41 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>社員詳細</title>
+</head>
+<body>
+	<h1>社員詳細</h1>
+	<table>
+		<tr>
+			<th>氏名</th>
+		</tr>
+		<tr>
+			<th>氏名(ひらがな)</th>
+		</tr>
+		<tr>
+			<th>生年月日</th>
+		</tr>
+		<tr>
+			<th>メールアドレス</th>
+		</tr>
+		<tr>
+			<th>所属会社</th>
+		</tr>
+		<tr>
+			<th>稼働状況</th>
+		</tr>
+		<tr>
+			<th>入社日</th>
+		</tr>
+		<tr>
+			<th>退職日</th>
+		</tr>
+		<tr>
+			<th>ステータス</th>
+		</tr>
+	</table>
+</body>
+</html>
