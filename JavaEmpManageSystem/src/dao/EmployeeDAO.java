@@ -7,12 +7,14 @@ import java.util.ArrayList;
 
 import dto.EmployeeDTO;
 import model.CalcAge;
+import model.TypeCasting;
 
-/**
- * 従業員全員のデータを取得するメソッド
- */
+
 public class EmployeeDAO extends BaseDAO {
 
+	/**
+	 * 従業員全員のデータを取得するメソッド
+	 **/
 	public ArrayList<EmployeeDTO> find(){
 		ArrayList<EmployeeDTO> empList = new ArrayList<EmployeeDTO>();
 
@@ -48,10 +50,17 @@ public class EmployeeDAO extends BaseDAO {
 				ed.setAbbreviation(rs.getString("abbreviation"));
 				ed.setAge(age);
 				ed.setBusinessManager(rs.getString("bussiness_manager"));
+
 				String eday = TypeCasting.toString(rs.getDate("enter_Date").toLocalDate());
+				ed.setStrEnterDate(eday);
+				ed.setCommissioningStatus(rs.getString("commissioning_status"));
 
-
+				// リストに追加
+				empList.add(ed);
 			}
+			rs.close();
+			pstmt.close();
+
 		} catch(SQLException e) {
 			e.printStackTrace();
 		} finally {

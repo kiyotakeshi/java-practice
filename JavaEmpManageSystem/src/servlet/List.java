@@ -30,8 +30,10 @@ public class List extends HttpServlet {
 			response.sendRedirect("./login");
 		}
 
-		EmployeeDAO dao = new EmployeeDAO();
-		ArrayList<EmployeeDTO> detailList = dao.find();
+		// 従業員
+		EmployeeDAO empDao = new EmployeeDAO();
+		ArrayList<EmployeeDTO> detailList = empDao.find();
+		CompanyDAO cmpDao = new CompanyDAO();
 
 		// 従業員一覧画面にフォワード
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/employeeList.jsp");

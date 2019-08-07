@@ -1,0 +1,9 @@
+docker pull mysql
+docker pull busybox
+docker run -v /var/lib/mysql --name mysql_data02 busybox
+docker run --volumes-from mysql_data02 --name mysql -e MYSQL_ROOT_PASSWORD=mysql -d -p 3306:3306 mysql
+docker ps
+docker exec -e LANG=C.UTF-8 -it [コンテナID] bash
+mysql -u root -p
+
+mysql
