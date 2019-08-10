@@ -6,6 +6,8 @@ public class CompanyDTO {
 	private int companyId;
 	private String companyName;
 	private String abbreviation;
+	private String isDeleted;
+
 	private LocalDate created;
 	private LocalDate modified;
 	private String createdId;
@@ -14,12 +16,12 @@ public class CompanyDTO {
 	public CompanyDTO() {
 	}
 
-	public CompanyDTO(int companyId, String companyName, String abbreviation, LocalDate created, LocalDate modified,
-			String createdId, String modifiedId) {
-
+	public CompanyDTO(int companyId, String companyName, String abbreviation, String isDeleted, LocalDate created,
+			LocalDate modified, String createdId, String modifiedId) {
 		this.companyId = companyId;
 		this.companyName = companyName;
 		this.abbreviation = abbreviation;
+		this.isDeleted = isDeleted;
 		this.created = created;
 		this.modified = modified;
 		this.createdId = createdId;
@@ -57,7 +59,13 @@ public class CompanyDTO {
 	public void setCreated(LocalDate created) {
 		this.created = created;
 	}
+	public String getIsDeleted() {
+		return isDeleted;
+	}
 
+	public void setIsDeleted(String isDeleted) {
+		this.isDeleted = isDeleted;
+	}
 	public LocalDate getModified() {
 		return modified;
 	}

@@ -24,7 +24,7 @@ public class EmployeeDAO extends BaseDAO {
 			StringBuilder sb = new StringBuilder();
 			sb.append("select * from employee_state As es ");
 			sb.append("join employee_info AS ei ON ");
-			sb.append("(es.employee_info_id = ei.employee_info_id)");
+			sb.append("(es.employee_info_id = ei.employee_id) ");
 			sb.append("left join company_info AS ci ");
 			sb.append("on (ei.company_info_id = ci.company_id);");
 
@@ -49,7 +49,7 @@ public class EmployeeDAO extends BaseDAO {
 
 				ed.setAbbreviation(rs.getString("abbreviation"));
 				ed.setAge(age);
-				ed.setBusinessManager(rs.getString("bussiness_manager"));
+				ed.setBusinessManager(rs.getString("business_manager"));
 
 				String eday = TypeCasting.toString(rs.getDate("enter_Date").toLocalDate());
 				ed.setStrEnterDate(eday);
