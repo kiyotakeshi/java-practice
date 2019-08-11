@@ -34,7 +34,7 @@ public class EmployeeDTO {
 	private String status;
 	private int age;
 	public String strBirthday;
-	public String strEnterDate;
+	private String strEnterDate;
 	public String strRetireDate;
 	/*
 	 * company_infoの変数
@@ -259,5 +259,5 @@ public class EmployeeDTO {
 	public void setAbbreviation(String abbreviation) {
 		this.abbreviation = abbreviation;
 	}
-	
+
 }

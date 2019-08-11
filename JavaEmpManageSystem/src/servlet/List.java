@@ -43,8 +43,8 @@ public class List extends HttpServlet {
 
 		// enum処理
         // values() で、列挙したオブジェクトをすべて持つ配列が得られる
-		request.setAttribute("com_status", CommissioningStatus.values());
-		request.setAttribute("dapart", Department.values());
+		request.setAttribute("comStatus", CommissioningStatus.values());
+		request.setAttribute("depart", Department.values());
 
 		// listをセット
 		request.setAttribute("detailList", detailList);
