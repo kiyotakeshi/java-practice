@@ -10,6 +10,7 @@
 </head>
 <body>
 	<h1>社員詳細</h1>
+
 	<form action="./detail" method="post">
 
 	<input type="hidden" name="userId" value="${emp.employeeId}">
@@ -68,11 +69,6 @@
 		</tr>
 
 		<tr>
-			<th>稼働状況</th>
-			<td><input type="text" value="${emp.nameHiragana}" name="nameHiragana" required /></td>
-		</tr>
-
-		<tr>
 			<th>担当管理営業</th>
 			<td><input type="text" value="${emp.businessManager}" name="manager" required /></td>
 		</tr>
@@ -85,7 +81,7 @@
 					<c:forEach var="depart" items="${depart}">
 
 						<!-- すでに登録されている社員の場合、その人の事業部が選択された状態で画面に出す-->
-						<option value="{depart.id}"
+						<option value="${depart.id}"
 							<c:if test="${emp.department == depart.id}">selected</c:if>>
 							${depart.name}
 						</option>
@@ -93,6 +89,21 @@
 				</select>
 			</td>
 		</tr>
+
+		<tr>
+			<th>稼働状況</th>
+			<td>
+				<c:forEach var="comissionState" items="${comissionState}">
+				<label>
+					<!-- すでに登録されている性別を選択した状態にする -->
+					<input type="radio" value="${comissionState.id}" name="run" required
+					<c:if test="${emp.commissioningStatus == comissionState.id}">checked</c:if> />
+						${comissionState.name}
+				</label>
+				</c:forEach>
+			</td>
+		</tr>
+
 
 		<tr>
 			<th>入社日</th>
@@ -111,7 +122,7 @@
 					<option value=""></option>
 					<c:forEach var="state" items="${state}">
 						<option value="${state.id}"
-							<c:if test="${emp.status == status.id}">selected</c:if>>
+							<c:if test="${emp.status == state.id}">selected</c:if>>
 							${state.name}
 						</option>
 					</c:forEach>

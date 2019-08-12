@@ -3,6 +3,7 @@ package dao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import dto.EmployeeDTO;
@@ -180,5 +181,190 @@ public class EmployeeDAO extends BaseDAO {
 			}
 		}
 		return empInfo;
+	}
+
+	public void update(EmployeeDTO empDto, String loginId) {
+
+		try {
+			con = connect();
+
+			// employee_info テーブルの設定　
+			StringBuilder sb = new StringBuilder();
+			sb.append("UPDATE employee_info SET ");
+			sb.append("name = ?,name_hiragana = ?,birthday = ?,sex  = ?,mail_address = ?, ");
+			sb.append("telephone_number = ?,company_info_id = ?,business_manager = ?,department = ?, ");
+			sb.append("commissioning_status = ?, modified_id = ? ");
+			sb.append("WHERE employee_id = ?;");
+
+			PreparedStatement pstmt = con.prepareStatement(sb.toString());
+
+			// 自動コミット機能をオフにして、複数のsqlをまとめてコミットする
+			con.setAutoCommit(false);
+
+			// ? にjspの入力をもとにDTOに格納した値を使用する
+			pstmt.setString(1, empDto.getName());
+			pstmt.setString(2, empDto.getNameHiragana());
+			pstmt.setDate(3, java.sql.Date.valueOf(empDto.getBirthday()));
+			pstmt.setString(4, empDto.getSex());
+			pstmt.setString(5, empDto.getMailAddress());
+			pstmt.setString(6, empDto.getTelephoneNumber());
+			pstmt.setLong(7, empDto.getCompanyInfoId());
+			pstmt.setString(8, empDto.getBusinessManager());
+			pstmt.setString(9, empDto.getDepartment());
+			pstmt.setString(10, empDto.getCommissioningStatus());
+			pstmt.setString(11, loginId);
+			pstmt.setInt(12, empDto.getEmployeeId());
+
+			// update後は社員一覧画面に戻すため
+			// 結果を rs に格納する必要はない
+			System.out.println(pstmt);
+			pstmt.executeUpdate();
+
+			// employee_state テーブルの設定　
+			StringBuilder sb2 = new StringBuilder();
+			sb2.append("UPDATE employee_state SET");
+			sb2.append(" enter_date = ?,retire_date = ?, ");
+			sb2.append("status = ?,modified_id = ? where employee_info_id = ?; ");
+
+			pstmt = con.prepareStatement(sb2.toString());
+
+			pstmt.setDate(1, java.sql.Date.valueOf(empDto.getEnterDate()));
+
+			LocalDate rd = empDto.getRetireDate();
+			if (rd != null) {
+				pstmt.setDate(2, java.sql.Date.valueOf(rd));
+			} else {
+				pstmt.setDate(2, null);
+			}
+
+			pstmt.setString(3, empDto.getStatus());
+			pstmt.setString(4, loginId);
+			pstmt.setInt(5, empDto.getEmployeeId());
+
+			System.out.println(pstmt);
+			pstmt.executeUpdate();
+
+			con.commit();
+
+		} catch (SQLException e) {
+			// 接続、またはSQL処理の失敗時
+			try {
+				con.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			e.printStackTrace();
+		} finally {
+			// データベース接続の切断
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					// 切断失敗の処理
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	/**
+	 * 新規登録を行うメソッド
+	 */
+	public void insert(EmployeeDTO empDto, String userId) {
+
+		try {
+			con = connect();
+
+			// SQLの準備
+			// 登録されている中でもっとも大きいIDの値を取得
+			PreparedStatement pstmt = con.prepareStatement("SELECT MAX(employee_id) AS MAXID FROM employee_info");
+
+			// SQLの実行
+			ResultSet rs = pstmt.executeQuery();
+
+			// 新規登録するIDを準備
+			int id = 0;
+			if (rs.next()) {
+				id = rs.getInt("MAXID") + 1;
+			}
+
+			con.setAutoCommit(false);
+
+			// employee_info テーブルへの登録
+			StringBuilder sb = new StringBuilder();
+			sb.append("INSERT INTO employee_info ");
+			sb.append("(employee_id,name, name_hiragana, birthday, ");
+			sb.append("sex,mail_address,telephone_number, ");
+			sb.append("company_info_id, business_manager, ");
+			sb.append("department, commissioning_status, ");
+			sb.append("created_id, modified_id) VALUES ");
+			sb.append("(?,?,?,?,?,?,?,?,?,?,?,?,?); ");
+
+			pstmt = con.prepareStatement(sb.toString());
+
+			pstmt.setInt(1, id);
+			pstmt.setString(2, empDto.getName());
+			pstmt.setString(3, empDto.getNameHiragana());
+			pstmt.setDate(4, java.sql.Date.valueOf(empDto.getBirthday()));
+			pstmt.setString(5, empDto.getSex());
+			pstmt.setString(6, empDto.getMailAddress());
+			pstmt.setString(7, empDto.getTelephoneNumber());
+			pstmt.setLong(8, empDto.getCompanyInfoId());
+			pstmt.setString(9, empDto.getBusinessManager());
+			pstmt.setString(10, empDto.getDepartment());
+			pstmt.setString(11, empDto.getCommissioningStatus());
+			pstmt.setString(12, userId);
+			pstmt.setString(13, userId);
+
+			// 新規登録後は一覧画面に移動するため
+			// 結果を格納は不要
+			pstmt.executeUpdate();
+
+			// employee_state テーブルへの登録
+			StringBuilder sb2 = new StringBuilder();
+			sb2.append("INSERT INTO employee_state ");
+			sb2.append("(employee_info_id, enter_date, retire_date, ");
+			sb2.append("status, created_id, modified_id) ");
+			sb2.append("VALUES(?,?,?,?,?,?)");
+
+			pstmt = con.prepareStatement(sb2.toString());
+
+			pstmt.setInt(1, id);
+			pstmt.setDate(2, java.sql.Date.valueOf(empDto.getEnterDate()));
+			LocalDate rd = empDto.getRetireDate();
+			if (rd != null) {
+				pstmt.setDate(3, java.sql.Date.valueOf(rd));
+			} else {
+				pstmt.setDate(3, null);
+			}
+
+			pstmt.setString(4, empDto.getStatus());
+			pstmt.setString(5, userId);
+			pstmt.setString(6, userId);
+
+			// 同様に結果を格納は不要
+			pstmt.executeUpdate();
+
+			con.commit();
+
+		} catch (SQLException e) {
+			// 接続失敗、またはSQL処理の失敗時
+			try {
+				con.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			e.printStackTrace();
+		} finally {
+			// データベース接続の切断
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					// 切断失敗の処理
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 }
