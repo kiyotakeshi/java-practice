@@ -2,7 +2,6 @@ package enumrate;
 /**
  * employeeStatusの状態要素のenumクラス
  */
-
 public enum Status {
 	ENROLLMENT("在籍",0),RETIREMENT("退職",1),JOINEDWAIT("入社待ち",2),JOINEDCANCELLATION("入社取り消し",3);
 

@@ -24,43 +24,57 @@ import enumrate.Sex;
 import enumrate.Status;
 import model.LoginUser;
 
+/**
+ * 社員詳細情報画面
+ * http://localhost:8080/JavaEmpManageSystem/detail
+ * http://localhost:8080/JavaEmpManageSystem/detail?empId=
+ * のコントローラー
+ */
 @WebServlet("/detail")
 public class Detail extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+		// ログインユーザか確認
 		HttpSession session = request.getSession();
 		LoginUser user = (LoginUser) session.getAttribute("loginUser");
 		if (user == null) {
 			response.sendRedirect("./login");
 		}
 
+		// enumの値をセッションスコープにセット
+        // values() で、列挙したオブジェクトをすべて持つ配列が得られる
 		request.setAttribute("sex", Sex.values());
 		request.setAttribute("comissionState", CommissioningStatus.values());
 		request.setAttribute("depart", Department.values());
 		request.setAttribute("delete", IsDeleted.values());
 		request.setAttribute("state", Status.values());
 
+		// 会社のデータを取得し配列に格納
 		CompanyDAO cmpDao = new CompanyDAO();
 		ArrayList<CompanyDTO> cmpList = cmpDao.findCompany();
-		request.setAttribute("cmpList",cmpList );
 
+		// 配列をセッションスコープに格納
+		request.setAttribute("cmpList",cmpList );
 		request.setCharacterEncoding("UTF-8");
 
 		// list.jspのリクエストパラメータを取得
-		String num = request.getParameter("empId");
+		// 詳細か削除のリンクを押している場合、値が格納されている
+		String strEmpId = request.getParameter("empId");
 
 		// 新規登録か更新登録かを判定
-		if (num == null || num == "") {
+		if (strEmpId == null || strEmpId == "") {
+
+			// リクエストスコープの中身がない場合は新規登録
 			request.setAttribute("btn", "登録");
 		} else {
 			request.setAttribute("btn", "更新");
 
-			// 1人分のDAOをセット
+			// 1人分のDAOをDBから値を取得しリクエストスコープにセット
 			EmployeeDAO empDao = new EmployeeDAO();
-			int number = Integer.parseInt(num);
-			EmployeeDTO empDto = empDao.findByEmployeeId(number);
+			int empId = Integer.parseInt(strEmpId);
+			EmployeeDTO empDto = empDao.findByEmployeeId(empId);
 
 			request.setAttribute("emp", empDto);
 		}
@@ -69,10 +83,16 @@ public class Detail extends HttpServlet {
 		dispatcher.forward(request,response);
 	}
 
+	/**
+	 * employeeDetail.jspで登録か更新を行った際の
+	 * Postリクエストの処理を行う
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		System.out.println("post");
+
+		// System.out.println("post");
 		request.setCharacterEncoding("UTF-8");
 
+		// ログインユーザか確認
 		HttpSession session = request.getSession();
 		LoginUser user = (LoginUser) session.getAttribute("loginUser");
 
@@ -81,19 +101,24 @@ public class Detail extends HttpServlet {
 		}
 
 		EmployeeDTO empDto = new EmployeeDTO();
+
+		// 更新処理かを判断する変数
 		boolean isUpdate = false;
 
 		// リクエストスコープ内にuserIdがある場合は更新処理になる
-		String userId = request.getParameter("userId");
+		String strUserId = request.getParameter("userId");
+
 		int empId = 0;
 
-		if (userId != null && !userId.isEmpty()) {
-			empId = Integer.parseInt(userId);
+		// nullかつ空ではない場合(必ず値が入っている必要がある)
+		if (strUserId != null && !strUserId.isEmpty()) {
+			empId = Integer.parseInt(strUserId);
 			empDto.setEmployeeId(empId);
 			isUpdate = true;
 		}
 
-		// employeeDetail.jsp で入力した値を変数に格納
+		// リクエストスコープ からemployeeDetail.jsp
+		// で入力した値を取得し、変数に格納
 		String name = request.getParameter("name");
 		String nameHiragana = request.getParameter("nameHiragana");
 		String birthday = request.getParameter("birthday");
@@ -109,9 +134,10 @@ public class Detail extends HttpServlet {
 		String retireDay = request.getParameter("retireDay");
 		String status = request.getParameter("status");
 
+		// jspの入力値に問題がないかチェックする変数
 		boolean jspParameterCheck = false;
 
-		// 取得したパラメータがnullかチェック
+		// 取得したパラメータがnullかつ空ではない(必ず値が入っている必要がある)かチェック
 		// retireDay については別のスコープでチェック
 		if (name != null && !name.isEmpty() && nameHiragana != null && !nameHiragana.isEmpty()
 		        && birthday != null && !birthday.isEmpty() && sex != null && !sex.isEmpty() && mail != null && !mail.isEmpty()
@@ -119,29 +145,33 @@ public class Detail extends HttpServlet {
 		        && manager != null && !manager.isEmpty() && department != null && !department.isEmpty() && run != null && !run.isEmpty()
 		        && enterDay != null && !enterDay.isEmpty() &&  status != null && !status.isEmpty()){
 
+			        // TODO:validation check
+
 			// 値に問題がないためtrueにする
 			jspParameterCheck = true;
-			        // TODO:validation check
 		    }
 
 			String url = "./detail";
 
-			// 入力値が無効の場合
-			System.out.println(jspParameterCheck);
+			// 入力値が無効(false)の場合
+			// System.out.println(jspParameterCheck);
 			if(! jspParameterCheck) {
+
+				// 更新処理の入力値が無効だった場合のリダイレクト先の設定
 				if (isUpdate) {
-					url += "?empId" + userId;
+					url += "?empId" + strUserId;
 				}
 
 				response.sendRedirect(url);
-				System.out.println("jsp parameter error");
+				// System.out.println("jsp parameter error");
 				return;
 			}
 
 			// validationを通したjspの入力値をもとに
-			// dtoのオブジェクトを作成
+			// DTOのオブジェクトを作成
 			empDto.setName(name);
 			empDto.setNameHiragana(nameHiragana);
+
 			LocalDate birth = LocalDate.parse(birthday, DateTimeFormatter.ofPattern("yyyy/MM/dd"));
 			empDto.setBirthday(birth);
 			empDto.setSex(sex);
@@ -151,31 +181,34 @@ public class Detail extends HttpServlet {
 			empDto.setBusinessManager(manager);
 			empDto.setDepartment(department);
 			empDto.setCommissioningStatus(run);
+
 			LocalDate eDay = LocalDate.parse(enterDay, DateTimeFormatter.ofPattern("yyyy/MM/dd"));
 			empDto.setEnterDate(eDay);
 
-			// ifのスコープ外で使えるように宣言
+			// 退職の有無を判定する変数を宣言
 			LocalDate rDay;
 
 			// 退職していた場合、型変換して値を格納
 			if (retireDay != null && !retireDay.isEmpty()) {
 				rDay = LocalDate.parse(retireDay, DateTimeFormatter.ofPattern("yyyy/MM/dd"));
-			} else {
+			}
+			// 退職日のデータがない場合はnullを格納
+			else {
 				rDay = null;
 			}
 			empDto.setRetireDate(rDay);
 			empDto.setStatus(status);
 
-			// 更新登録
+			// 更新登録メソッドを実行
 			if (isUpdate) {
 				EmployeeDAO empDao = new EmployeeDAO();
 				empDao.update(empDto, user.getLoginId());
-				System.out.println("update");
+				// System.out.println("update");
 			}
 			// 新規登録
 			else {
 				EmployeeDAO empDao = new EmployeeDAO();
-				empDao.insert(empDto, userId);
+				empDao.insert(empDto, strUserId);
 			}
 
 			// 社員一覧画面にリダイレクト

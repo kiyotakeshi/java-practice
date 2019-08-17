@@ -2,6 +2,10 @@ package dto;
 
 import java.time.LocalDate;
 
+/**
+ *  companyDAOで取得した情報を保存し
+ *  データを転送する目的で使用されるDTO(Data Transfer Object)
+ */
 public class CompanyDTO {
 	private int companyId;
 	private String companyName;

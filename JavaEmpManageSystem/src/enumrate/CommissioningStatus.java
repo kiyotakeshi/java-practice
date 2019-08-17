@@ -1,8 +1,8 @@
 package enumrate;
-/*
- *  employee_infoの稼働状況要素のenumクラス
- */
 
+/**
+ *  employee_infoの稼働状況要素(commissioning_status)のenumクラス
+ */
 public enum CommissioningStatus {
 	NOTRUNNING("未稼働",0), RUNNING("稼働",1);
 

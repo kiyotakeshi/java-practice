@@ -2,17 +2,20 @@
 	pageEncoding="UTF-8"%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<!-- 社員一覧画面  -->
+ <!-- List.javaからフォワードされる -->
 <!DOCTYPE html>
 <html>
 
 <head>
-<meta charset="UTF-8">
+<meta charset=UTF-8">
+<!--  ブラウザのタブに表示されるタイトル -->
 <title>社員一覧</title>
 </head>
 
 <body>
 	<p>
-		<!-- <a href="/JavaEmpManageSystem/login">ログアウト</a> -->
 		<!--  ./ はプロジェクトのトップディレクトリを指す-->
 		<a href="./login">ログアウト</a>
 	</p>
@@ -20,6 +23,7 @@
 	<a href="./detail">新規登録</a>
 
 	<table>
+		<!-- 表の横一列を定義  -->
 		<tr>
 			<th>No</th>
 			<th>会社</th>
@@ -33,36 +37,72 @@
 			<th>詳細</th>
 			<th>削除</th>
 		</tr>
-		<c:forEach var="list" items="${detailList}">
 
+		<!-- JSTLでセッションスコープから従業員データの配列を取得  -->
+		<c:forEach var="list" items="${detailList}">
 			<tr class="detailList">
+
+				<!-- No -->
 				<td>${list.employeeId}</td>
-				<td><c:forEach var="cmpList" items="${cmpList}">
+
+				<!-- 会社 -->
+				<td>
+					<!-- セッションスコープから会社データの配列を取得 -->
+					<c:forEach var="cmpList" items="${cmpList}">
+
+						<!-- セッションスコープのcomany_idの値が等しければ
+								company_infohにある会社の略称(abbreviation)を表示する -->
 						<c:if test="${cmpList.companyId == list.companyInfoId}">
                             ${cmpList.abbreviation}
                         </c:if>
-					</c:forEach></td>
-				<!-- departmentのenumとdetailListのdepartmentのidが一致するか調べる -->
-				<td><c:forEach var="dpt" items="${depart}">
+					</c:forEach>
+				</td>
+
+				<!-- 事業部 -->
+				<td>
+					<!-- DBには事業部IDしかないためenumのIDと一致した場合
+							enumにある事業部名を表示 -->
+					<c:forEach var="dpt" items="${depart}">
 						<c:if test="${list.department == dpt.id}">
                 			${dpt.name}
                 		</c:if>
-					</c:forEach></td>
+					</c:forEach>
+				</td>
+
+				<!-- 氏名 -->
 				<td>${list.name}</td>
+				<!-- 氏名（ひらがな） -->
 				<td>${list.nameHiragana}</td>
+				<!-- 年齢 -->
 				<td>${list.age}</td>
+				<!-- 担当管理営業 -->
 				<td>${list.businessManager}</td>
+				<!-- 入社日 -->
 				<td>${list.strEnterDate}</td>
-				<td><c:forEach var="comStatus" items="${comStatus}">
+
+				<!-- 稼働状況 -->
+				<td>
+					<!-- DBには稼働状況を表す　IDしかないためenumのIDと一致した場合
+							enumにある稼働状況を表示 -->
+					<c:forEach var="comStatus" items="${comStatus}">
 						<c:if test="${list.commissioningStatus == comStatus.id }">
                 			${comStatus.name}
-                		</c:if>
-					</c:forEach></td>
+	               		</c:if>
+					</c:forEach>
+				</td>
+
+				<!-- 詳細 -->
+				<!-- empIdをリクエストパラメータに入れる -->
 				<td><a href="./detail?empId=${list.employeeId}">詳細</a></td>
+
+				 <!-- 削除 -->
+				<!-- empIdをリクエストパラメータに入れる -->
 				<td>
+					<!-- 削除のリンクを押すと確認のメソッドが呼ばれる -->
 					<a href="./delete?empId=${list.employeeId}" onclick="return confirm('${list.abbreviation} ${list.name} を削除しますか？')">削除
 					</a>
 				</td>
+
 			</tr>
 		</c:forEach>
 	</table>

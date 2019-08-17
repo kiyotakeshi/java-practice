@@ -3,7 +3,6 @@ package enumrate;
 /**
  * employeeStateのデータ状態要素のenumクラス
  */
-
 public enum IsDeleted {
 	EXIST("存在",0),DELETE("削除",1);
 	

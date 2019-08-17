@@ -13,6 +13,11 @@ import model.LoginUser;
  */
 public class LoginDAO extends BaseDAO {
 
+	/**
+	 * DBに接続し、レコードが存在するかを返す
+	 * @param LoginUser
+	 * @return LoginDTO logDto
+	 */
 	public LoginDTO findByLogin(LoginUser LoginUser) {
 
             // 初期化
@@ -38,16 +43,12 @@ public class LoginDAO extends BaseDAO {
             ResultSet rs = pstmt.executeQuery();
             //次の行がある場合、処理を続ける
             if (rs.next()) {
-                // loginidおかしいかもしれん
                 String login_id = rs.getString("login_id");
                 String password = rs.getString("password");
                 String is_deleted = rs.getString("is_deleted");
-//                LocalDate created = rs.getDate("created").toLocalDate();
-//                LocalDate modified = rs.getDate("modified").toLocalDate();
                 String created_id = rs.getString("created_id");
                 String modified_id = rs.getString("modified_id");
 
-                //logindtoに値を入れる
                 logDto = new LoginDTO(login_id, password);
             }
         } catch(SQLException e) {

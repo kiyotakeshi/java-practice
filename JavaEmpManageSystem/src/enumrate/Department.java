@@ -1,5 +1,8 @@
 package enumrate;
 
+/**
+ * employee_infoの事業部要素(department)のenumクラス
+ */
 public enum Department {
 	DEVELOPMENT("開発",0),
 	NETWORK("NW",1),

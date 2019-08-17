@@ -10,54 +10,74 @@ import dto.EmployeeDTO;
 import model.CalcAge;
 import model.TypeCasting;
 
+/**
+ * 従業員データにアクセスするためのDAO
+ */
 public class EmployeeDAO extends BaseDAO {
 
 	/**
 	 * 従業員全員のデータを取得するメソッド
-	 **/
+	 * @return EmployeeDTO
+	 */
 	public ArrayList<EmployeeDTO> find() {
+
+		// ArrayListは要素数が決まっていない動的な配列(Listは初期化時に要素数が決まっている)
 		ArrayList<EmployeeDTO> empList = new ArrayList<EmployeeDTO>();
 
 		try {
 			con = connect();
 
+			// StringBuilderインスタンスが内部に連結した文字列を蓄える
+			// メモリ領域(バッファ)を持つため、 + 演算子を使うより高速で処理できる
 			StringBuilder sb = new StringBuilder();
+
+			// appendメソッドの戻り値はStringBuilderのため
+			// 自身への参照を返すメソッドを連続して呼び出される(メソッドチェーン)
 			sb.append("select * from employee_state As es ");
 			sb.append("join employee_info AS ei ON ");
 			sb.append("(es.employee_info_id = ei.employee_id) ");
 			sb.append("left join company_info AS ci ");
-			sb.append("on (ei.company_info_id = ci.company_id);");
+			sb.append("on (ei.company_info_id = ci.company_id) ");
+			sb.append("order by employee_id ASC;");
 
-			// SQLの準備
+			// SQLの準備(StringBuilderをString型に変換)
 			PreparedStatement pstmt = con.prepareStatement(sb.toString());
-			System.out.println(pstmt);
+			// System.out.println(pstmt);
 
-			// SQLの実行
+			// SQLの実行し、結果をrsに格納
 			ResultSet rs = pstmt.executeQuery();
 
 			while (rs.next()) {
+
+				// 従業員1人ごとのデータ
 				EmployeeDTO ed = new EmployeeDTO();
 
+				// DBのレコードをDTOにセット
+				// ex) employee_idレコードをemployeeIdにセット
 				ed.setEmployeeId(rs.getInt("employee_id"));
 				ed.setCompanyInfoId(rs.getInt("company_info_id"));
 				ed.setDepartment(rs.getString("department"));
 				ed.setName(rs.getString("name"));
 				ed.setNameHiragana(rs.getString("name_hiragana"));
 
-				// 年齢の計算
+				// 年齢の計算を行うメソッドに引数を渡すため
+				// birthdayレコードをLocalDate型に変換
 				int age = CalcAge.calcAge(rs.getDate("birthday").toLocalDate());
+				ed.setAge(age);
 
 				ed.setAbbreviation(rs.getString("abbreviation"));
-				ed.setAge(age);
 				ed.setBusinessManager(rs.getString("business_manager"));
 
 				String eday = TypeCasting.toString(rs.getDate("enter_date").toLocalDate());
 				ed.setStrEnterDate(eday);
+
 				ed.setCommissioningStatus(rs.getString("commissioning_status"));
 
-				// リストに追加
+				// メソッドの返り値である配列に従業員データを追加
 				empList.add(ed);
 			}
+
+			// SQLの終了処理
 			rs.close();
 			pstmt.close();
 
@@ -73,6 +93,7 @@ public class EmployeeDAO extends BaseDAO {
 				}
 			}
 		}
+
 		return empList;
 	}
 
@@ -115,18 +136,27 @@ public class EmployeeDAO extends BaseDAO {
 		}
 	}
 
+	/**
+	 * empIdをもとにDBから情報を取得するメソッド
+	 * @param empId
+	 * @return EmployeeDTO
+	 */
 	public EmployeeDTO findByEmployeeId(int empId) {
 
 		EmployeeDTO empInfo = null;
 		try {
 			con = connect();
 
+			// StringBuilderインスタンスが内部に連結した文字列を蓄える
+			// メモリ領域(バッファ)を持つため、 + 演算子を使うより高速で処理できる
 			StringBuilder sb = new StringBuilder();
 			sb.append("SELECT * FROM employee_state AS es ");
 			sb.append("JOIN employee_info AS ei ");
 			sb.append("ON (es.employee_info_id = ei.employee_id) ");
 			sb.append("LEFT JOIN company_info AS ci ");
 			sb.append("ON (ei.company_info_id = ci.company_id)");
+
+			// メソッドの引数、empIdを使用してレコードを取得
 			sb.append("WHERE es.employee_info_id = ?");
 
 			// SQLの準備
@@ -136,13 +166,16 @@ public class EmployeeDAO extends BaseDAO {
 			ResultSet rs = pstmt.executeQuery();
 
 			if (rs.next()) {
+
+				// DBから取得したデータをDTO(Data Transfer Object)に格納
 				empInfo = new EmployeeDTO();
 
 				empInfo.setEmployeeId(rs.getInt("employee_id"));
 				empInfo.setName(rs.getString("name"));
 				empInfo.setNameHiragana(rs.getString("name_hiragana"));
 
-				// DBではdate型のためLocalDate型を経由してString型にキャスト
+				// DBから取得したするとdate型のため
+				// LocalDate型を経由してString型にキャスト
 				String birthday = TypeCasting.toString(rs.getDate("birthday").toLocalDate());
 				empInfo.setStrBirthday(birthday);
 
@@ -158,6 +191,8 @@ public class EmployeeDAO extends BaseDAO {
 				String eday = TypeCasting.toString(rs.getDate("enter_date").toLocalDate());
 				empInfo.setStrEnterDate(eday);
 
+				// 退職日のデータが取得できている場合
+				// 型変換してDTOにセット
 				if (rs.getDate("retire_date") != null) {
 					String rday = TypeCasting.toString(rs.getDate("retire_date").toLocalDate());
 					empInfo.setStrRetireDate(rday);
@@ -166,8 +201,8 @@ public class EmployeeDAO extends BaseDAO {
 				empInfo.setStatus(rs.getString("status"));
 			}
 
+		// 接続失敗、またはSQL処理の失敗時
 		} catch (SQLException e) {
-			// 接続失敗、またはSQL処理の失敗時
 			e.printStackTrace();
 		} finally {
 			// データベース接続の切断
@@ -183,12 +218,18 @@ public class EmployeeDAO extends BaseDAO {
 		return empInfo;
 	}
 
+	/**
+	 * jspで入力した値で、
+	 * リクエストスコープ、DTOを経由し、DBのレコードを更新するメソッド
+	 * @param empDto
+	 * @param loginId
+	 */
 	public void update(EmployeeDTO empDto, String loginId) {
 
 		try {
 			con = connect();
 
-			// employee_info テーブルの設定　
+			// employee_info テーブルの設定
 			StringBuilder sb = new StringBuilder();
 			sb.append("UPDATE employee_info SET ");
 			sb.append("name = ?,name_hiragana = ?,birthday = ?,sex  = ?,mail_address = ?, ");
@@ -230,6 +271,8 @@ public class EmployeeDAO extends BaseDAO {
 
 			pstmt.setDate(1, java.sql.Date.valueOf(empDto.getEnterDate()));
 
+			// 退職日のデータがある場合、
+			// LocalDate型関数を経由してテーブルの型(Date）の値をセット
 			LocalDate rd = empDto.getRetireDate();
 			if (rd != null) {
 				pstmt.setDate(2, java.sql.Date.valueOf(rd));
@@ -241,9 +284,9 @@ public class EmployeeDAO extends BaseDAO {
 			pstmt.setString(4, loginId);
 			pstmt.setInt(5, empDto.getEmployeeId());
 
-			System.out.println(pstmt);
+			// System.out.println(pstmt);
+			// SQLの実行
 			pstmt.executeUpdate();
-
 			con.commit();
 
 		} catch (SQLException e) {
@@ -268,7 +311,10 @@ public class EmployeeDAO extends BaseDAO {
 	}
 
 	/**
-	 * 新規登録を行うメソッド
+	 * jspで入力した値で、
+	 * リクエストスコープ、DTOを経由し、DBのレコードを更新するメソッド
+	 * @param empDto
+	 * @param userId
 	 */
 	public void insert(EmployeeDTO empDto, String userId) {
 
