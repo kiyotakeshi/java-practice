@@ -1,4 +1,4 @@
-### JSP,Servletを使用した勤怠情報登録Webアプリ
+### JSP,Servletを使用した社員情報登録Webアプリ
 
 - 実行環境
     - Java8
